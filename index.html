@@ -1,2757 +1,822 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
-    
-            <meta name="viewport" content="width=device-width,
-                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-            <style>
-                #map_3a6d12ff4f08af77eb614bff89ed6448 {
-                    position: relative;
-                    width: 100.0%;
-                    height: 100.0%;
-                    left: 0.0%;
-                    top: 0.0%;
-                }
-                .leaflet-container { font-size: 1rem; }
-            </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard BI – Tendido Fibra Óptica</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
-            <style>html, body {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
-            </style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #21262d;
+    --accent: #00d4aa;
+    --accent2: #3b82f6;
+    --accent3: #f59e0b;
+    --accent4: #ef4444;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #6e7681;
+    --ss-color: #3b82f6;
+    --dis-color: #f59e0b;
+    --con-color: #00d4aa;
+    --pen-color: #6b7280;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
 
-            <style>#map {
-                position:absolute;
-                top:0;
-                bottom:0;
-                right:0;
-                left:0;
-                }
-            </style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-            <script>
-                L_NO_TOUCH = false;
-                L_DISABLE_3D = false;
-            </script>
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
 
-        
-    <script src="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-search@2.9.7/dist/leaflet-search.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-search@2.9.7/dist/leaflet-search.min.css"/>
+  /* ─── HEADER ─── */
+  .header {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 60%, #1a2332 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .header-title h1 { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+  .header-title p { font-size: 12px; color: var(--text2); margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--text2);
+    font-family: 'DM Mono', monospace;
+  }
+  .badge.live::before {
+    content: '●';
+    color: var(--accent);
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <style>
-        /* Estilos generales */
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-        }
-        
-        /* Controles del mapa en móviles */
-        .leaflet-control-zoom {
-            border: none !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-        }
-        
-        .leaflet-control-zoom a {
-            width: 40px !important;
-            height: 40px !important;
-            line-height: 40px !important;
-            font-size: 22px !important;
-            border-radius: 8px !important;
-            margin: 2px !important;
-        }
-        
-        /* Control de capas */
-        .leaflet-control-layers {
-            border-radius: 10px !important;
-            border: none !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-            max-height: 80vh;
-            overflow-y: auto;
-            background: rgba(255,255,255,0.95) !important;
-        }
-        
-        .leaflet-control-layers-toggle {
-            width: 44px !important;
-            height: 44px !important;
-            background-size: 26px 26px !important;
-            background-color: white !important;
-            border-radius: 30px !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-        }
-        
-        /* Barra de búsqueda */
-        .leaflet-control-search {
-            border-radius: 30px !important;
-            border: none !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-            background: white !important;
-        }
-        
-        .leaflet-control-search input {
-            border-radius: 30px !important;
-            border: none !important;
-            height: 44px !important;
-            padding: 0 15px !important;
-            font-size: 16px !important;
-            width: 200px !important;
-        }
-        
-        /* Popups */
-        .leaflet-popup-content {
-            font-size: 14px !important;
-            line-height: 1.5 !important;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        /* Ajustes responsivos */
-        @media (max-width: 600px) {
-            .leaflet-control-zoom {
-                top: 70px !important;
-                left: 10px !important;
-            }
-            
-            .leaflet-control-search {
-                top: 10px !important;
-                left: 10px !important;
-                right: 10px !important;
-                width: auto !important;
-            }
-            
-            .leaflet-control-search input {
-                width: calc(100% - 60px) !important;
-            }
-            
-            .leaflet-control-layers {
-                bottom: 20px !important;
-                right: 10px !important;
-                max-width: 200px;
-            }
-            
-            .leaflet-control-attribution {
-                font-size: 8px !important;
-            }
-        }
-        
-        /* Mejoras para pantalla completa en móvil */
-        .leaflet-container {
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .leaflet-marker-icon {
-            transition: transform 0.2s;
-        }
-        
-        .leaflet-marker-icon:active {
-            transform: scale(1.2);
-        }
-        
-        /* Botón flotante para volver arriba */
-        .back-to-top {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: white;
-            color: #667eea;
-            width: 44px;
-            height: 44px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            cursor: pointer;
-            z-index: 1000;
-            border: none;
-            font-size: 24px;
-            transition: all 0.3s;
-        }
-        
-        .back-to-top:hover {
-            transform: scale(1.1);
-            background: #667eea;
-            color: white;
-        }
-        
-        @media (max-width: 600px) {
-            .back-to-top {
-                bottom: 80px;
-            }
-        }
-    </style>
-    </head>
-    
+  /* ─── FILTERS ─── */
+  .filters-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 28px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filters-bar label { font-size: 12px; color: var(--text2); margin-right: 4px; }
+  .filter-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .filter-select:focus { outline: none; border-color: var(--accent); }
+  .filter-reset {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .filter-reset:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-info { margin-left: auto; font-size: 12px; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+  /* ─── LAYOUT ─── */
+  .main { padding: 22px 28px; display: grid; gap: 18px; }
+
+  /* ─── KPI ROW ─── */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, border-color .2s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); border-color: var(--border); }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .kpi-card.total::before { background: var(--accent2); }
+  .kpi-card.ss::before { background: var(--ss-color); }
+  .kpi-card.dis::before { background: var(--dis-color); }
+  .kpi-card.con::before { background: var(--con-color); }
+
+  .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .kpi-label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-icon { font-size: 18px; opacity: 0.7; }
+  .kpi-value { font-size: 36px; font-weight: 700; color: var(--text); line-height: 1; letter-spacing: -1px; font-family: 'DM Mono', monospace; }
+  .kpi-sub { margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+  .kpi-pct { font-size: 13px; font-weight: 600; }
+  .kpi-pct.ss { color: var(--ss-color); }
+  .kpi-pct.dis { color: var(--dis-color); }
+  .kpi-pct.con { color: var(--con-color); }
+  .kpi-desc { font-size: 11px; color: var(--text3); }
+  .progress-thin {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress-thin-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+  .fill-ss { background: var(--ss-color); }
+  .fill-dis { background: var(--dis-color); }
+  .fill-con { background: var(--con-color); }
+
+  /* ─── ROW 2 ─── */
+  .row2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .row4 { display: grid; grid-template-columns: 1fr; gap: 18px; }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 18px;
+  }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .card-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .card-tag {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+  .chart-wrap { position: relative; }
+
+  /* ─── PHASE GAUGE ─── */
+  .phase-gauges { display: flex; flex-direction: column; gap: 14px; }
+  .phase-item { }
+  .phase-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .phase-name { font-size: 12px; font-weight: 500; color: var(--text); }
+  .phase-nums { font-size: 12px; color: var(--text2); font-family: 'DM Mono', monospace; }
+  .phase-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .phase-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1.2s cubic-bezier(.25,.8,.25,1);
+  }
+  .phase-pct { font-size: 11px; font-weight: 700; margin-top: 3px; text-align: right; }
+
+  /* ─── STATUS DONUT ─── */
+  .donut-wrap { display: flex; gap: 16px; align-items: center; }
+  .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { font-size: 12px; color: var(--text2); flex: 1; }
+  .legend-val { font-size: 12px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; }
+
+  /* ─── TABLE ─── */
+  .table-wrap { overflow-x: auto; max-height: 340px; overflow-y: auto; }
+  .table-wrap::-webkit-scrollbar { width: 5px; height: 5px; }
+  .table-wrap::-webkit-scrollbar-track { background: transparent; }
+  .table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    position: sticky; top: 0;
+    background: var(--surface2);
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+    cursor: pointer;
+  }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td {
+    padding: 9px 12px;
+    font-size: 12px;
+    color: var(--text2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+  tbody td:first-child { color: var(--text3); font-family: 'DM Mono', monospace; }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .st-con { background: rgba(0,212,170,.12); color: var(--con-color); border: 1px solid rgba(0,212,170,.25); }
+  .st-dis { background: rgba(245,158,11,.12); color: var(--dis-color); border: 1px solid rgba(245,158,11,.25); }
+  .st-ss  { background: rgba(59,130,246,.12); color: var(--ss-color); border: 1px solid rgba(59,130,246,.25); }
+  .st-pen { background: rgba(107,114,128,.12); color: #9ca3af; border: 1px solid rgba(107,114,128,.25); }
+
+  /* ─── SEARCH ─── */
+  .search-wrap { position: relative; margin-bottom: 14px; }
+  .search-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px 8px 34px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color .2s;
+  }
+  .search-input:focus { outline: none; border-color: var(--accent); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text3); }
+
+  /* ─── KM CARD ─── */
+  .km-big { text-align: center; padding: 10px 0; }
+  .km-num { font-size: 52px; font-weight: 700; color: var(--accent); font-family: 'DM Mono', monospace; letter-spacing: -2px; }
+  .km-label { font-size: 14px; color: var(--text2); margin-top: 4px; }
+  .km-sub { font-size: 12px; color: var(--text3); margin-top: 8px; }
+  .km-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .km-stat { background: var(--surface2); border-radius: 8px; padding: 10px; text-align: center; }
+  .km-stat-val { font-size: 18px; font-weight: 700; color: var(--text); font-family: 'DM Mono', monospace; }
+  .km-stat-lbl { font-size: 10px; color: var(--text3); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ─── DIVIDER ─── */
+  .section-label {
+    font-size: 11px; font-weight: 600; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 1px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 4px;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1100px) {
+    .row2, .row3 { grid-template-columns: 1fr 1fr; }
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 700px) {
+    .row2, .row3 { grid-template-columns: 1fr; }
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+    .main { padding: 14px; }
+    .header { padding: 12px 14px; }
+  }
+</style>
+</head>
 <body>
-    
-    
-            <div class="folium-map" id="map_3a6d12ff4f08af77eb614bff89ed6448" ></div>
-        
 
-    <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Volver arriba">
-        ↑
-    </button>
-    </body>
-    
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">📡</div>
+    <div class="header-title">
+      <h1>Tendido de Fibra Óptica — Panel BI</h1>
+      <p>Gestión y Control del Cronograma · Proyecto IE 365</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge live">En vivo</span>
+    <span class="badge">128 IE · 3 Regionales</span>
+    <span class="badge">479.6 km</span>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-bar">
+  <label>Regional:</label>
+  <select class="filter-select" id="f-regional" onchange="applyFilters()">
+    <option value="">Todas</option>
+    <option>Andina</option><option>Norte</option><option>Sur</option>
+  </select>
+  <label>Operador:</label>
+  <select class="filter-select" id="f-operador" onchange="applyFilters()">
+    <option value="">Todos</option>
+    <option>Tigo</option><option>Telefónica</option>
+  </select>
+  <label>Departamento:</label>
+  <select class="filter-select" id="f-depto" onchange="applyFilters()">
+    <option value="">Todos</option>
+  </select>
+  <label>Estado:</label>
+  <select class="filter-select" id="f-estado" onchange="applyFilters()">
+    <option value="">Todos</option>
+    <option>Construcción</option><option>Diseño</option><option>Site Survey</option><option>En Proceso</option>
+  </select>
+  <button class="filter-reset" onclick="resetFilters()">↺ Limpiar filtros</button>
+  <span class="filter-info" id="filter-count">128 registros</span>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- KPI ROW -->
+  <div class="kpi-row" id="kpi-row">
+    <div class="kpi-card total">
+      <div class="kpi-header">
+        <div class="kpi-label">Total IE</div>
+        <div class="kpi-icon">🏫</div>
+      </div>
+      <div class="kpi-value" id="kpi-total">128</div>
+      <div class="kpi-sub">
+        <span class="kpi-desc">Instituciones Educativas</span>
+      </div>
+    </div>
+    <div class="kpi-card ss">
+      <div class="kpi-header">
+        <div class="kpi-label">Site Survey</div>
+        <div class="kpi-icon">🔍</div>
+      </div>
+      <div class="kpi-value" id="kpi-ss">90</div>
+      <div class="kpi-sub">
+        <span class="kpi-pct ss" id="kpi-ss-pct">70.3%</span>
+        <span class="kpi-desc">completado</span>
+      </div>
+      <div class="progress-thin"><div class="progress-thin-fill fill-ss" id="bar-ss" style="width:70.3%"></div></div>
+    </div>
+    <div class="kpi-card dis">
+      <div class="kpi-header">
+        <div class="kpi-label">Diseño</div>
+        <div class="kpi-icon">📐</div>
+      </div>
+      <div class="kpi-value" id="kpi-dis">74</div>
+      <div class="kpi-sub">
+        <span class="kpi-pct dis" id="kpi-dis-pct">57.8%</span>
+        <span class="kpi-desc">completado</span>
+      </div>
+      <div class="progress-thin"><div class="progress-thin-fill fill-dis" id="bar-dis" style="width:57.8%"></div></div>
+    </div>
+    <div class="kpi-card con">
+      <div class="kpi-header">
+        <div class="kpi-label">Construcción</div>
+        <div class="kpi-icon">🏗️</div>
+      </div>
+      <div class="kpi-value" id="kpi-con">41</div>
+      <div class="kpi-sub">
+        <span class="kpi-pct con" id="kpi-con-pct">32.0%</span>
+        <span class="kpi-desc">completado</span>
+      </div>
+      <div class="progress-thin"><div class="progress-thin-fill fill-con" id="bar-con" style="width:32.0%"></div></div>
+    </div>
+  </div>
+
+  <!-- ROW 2 -->
+  <div class="row2">
+    <!-- Avance por Regional (barras agrupadas) -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Avance por Regional</div>
+          <div class="card-sub">Comparativo de fases por regional</div>
+        </div>
+        <span class="card-tag">Barras agrupadas</span>
+      </div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chart-regional"></canvas>
+      </div>
+    </div>
+
+    <!-- Estado general Donut -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Estado Actual de IE</div>
+          <div class="card-sub">Distribución por última fase completada</div>
+        </div>
+        <span class="card-tag">Rosquilla</span>
+      </div>
+      <div class="donut-wrap">
+        <div style="width:160px; height:160px; flex-shrink:0;">
+          <canvas id="chart-estado"></canvas>
+        </div>
+        <div class="donut-legend" id="legend-estado"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3 -->
+  <div class="row3">
+    <!-- Avance por Operador -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Avance por Operador</div>
+          <div class="card-sub">Tigo vs Telefónica</div>
+        </div>
+        <span class="card-tag">Horizontal</span>
+      </div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="chart-operador"></canvas>
+      </div>
+    </div>
+
+    <!-- KM por departamento -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Km de FO por Departamento</div>
+          <div class="card-sub">Total tendido por zona</div>
+        </div>
+        <span class="card-tag">Barras</span>
+      </div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="chart-km-depto"></canvas>
+      </div>
+    </div>
+
+    <!-- KM Total -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Métricas de Tendido F.O.</div>
+          <div class="card-sub">Distancias acumuladas</div>
+        </div>
+      </div>
+      <div class="km-big">
+        <div class="km-num" id="km-total">479.6</div>
+        <div class="km-label">km de fibra óptica</div>
+        <div class="km-sub">en la selección actual</div>
+      </div>
+      <div class="km-stats">
+        <div class="km-stat">
+          <div class="km-stat-val" id="km-avg">3.75</div>
+          <div class="km-stat-lbl">km promedio / IE</div>
+        </div>
+        <div class="km-stat">
+          <div class="km-stat-val" id="km-max">23.5</div>
+          <div class="km-stat-lbl">km máximo</div>
+        </div>
+      </div>
+      <!-- Fases gauge -->
+      <div class="phase-gauges" style="margin-top:16px">
+        <div class="phase-item">
+          <div class="phase-top">
+            <span class="phase-name">🔍 Site Survey</span>
+            <span class="phase-nums" id="pg-ss-nums">90 / 128</span>
+          </div>
+          <div class="phase-bar"><div class="phase-fill fill-ss" id="pg-ss" style="width:70.3%"></div></div>
+          <div class="phase-pct ss" id="pg-ss-pct" style="color:var(--ss-color)">70.3%</div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-top">
+            <span class="phase-name">📐 Diseño</span>
+            <span class="phase-nums" id="pg-dis-nums">74 / 128</span>
+          </div>
+          <div class="phase-bar"><div class="phase-fill fill-dis" id="pg-dis" style="width:57.8%"></div></div>
+          <div class="phase-pct" id="pg-dis-pct" style="color:var(--dis-color)">57.8%</div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-top">
+            <span class="phase-name">🏗️ Construcción</span>
+            <span class="phase-nums" id="pg-con-nums">41 / 128</span>
+          </div>
+          <div class="phase-bar"><div class="phase-fill fill-con" id="pg-con" style="width:32.0%"></div></div>
+          <div class="phase-pct" id="pg-con-pct" style="color:var(--con-color)">32.0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 4 – Tabla detalle -->
+  <div class="row4">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Detalle de Instituciones Educativas</div>
+          <div class="card-sub">Haga clic en una fila para ver más información</div>
+        </div>
+        <span class="card-tag" id="table-count">128 registros</span>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">🔎</span>
+        <input type="text" class="search-input" placeholder="Buscar institución, municipio, operador…" oninput="filterTable(this.value)" id="search-box">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Institución Educativa</th>
+              <th>Regional</th>
+              <th>Departamento</th>
+              <th>Municipio</th>
+              <th>Operador</th>
+              <th>Estado</th>
+              <th>Dist (m)</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 <script>
-    
-    
-            var map_3a6d12ff4f08af77eb614bff89ed6448 = L.map(
-                "map_3a6d12ff4f08af77eb614bff89ed6448",
-                {
-                    center: [4.711, -74.0721],
-                    crs: L.CRS.EPSG3857,
-                    ...{
-  "zoom": 11,
-  "zoomControl": true,
-  "preferCanvas": false,
-}
+// ─── DATA ───────────────────────────────────────────────
+const RAW = {"resumen":{"total_ie":128,"ss_completado":90,"disenio_completado":74,"construccion_completada":41,"pct_ss":70.3,"pct_dis":57.8,"pct_con":32.0,"total_km":479.6,"km_promedio":3.75},"por_regional":[{"Regional":"Andina","total":13,"ss_ok":11,"dis_ok":10,"con_ok":10},{"Regional":"Norte","total":9,"ss_ok":6,"dis_ok":6,"con_ok":6},{"Regional":"Sur","total":106,"ss_ok":73,"dis_ok":58,"con_ok":25}],"por_operador":[{"Operador":"Telefónica","total":64,"ss_ok":51,"dis_ok":43,"con_ok":16},{"Operador":"Tigo","total":64,"ss_ok":39,"dis_ok":31,"con_ok":25}],"por_departamento":[{"Departamento":"Antioquia","total":12,"ss_ok":11,"dis_ok":10,"con_ok":10,"km_total":45.1},{"Departamento":"Arauca","total":1,"ss_ok":0,"dis_ok":0,"con_ok":0,"km_total":0.4},{"Departamento":"Casanare","total":5,"ss_ok":0,"dis_ok":0,"con_ok":0,"km_total":20.5},{"Departamento":"Cauca","total":2,"ss_ok":0,"dis_ok":0,"con_ok":0,"km_total":6.7},{"Departamento":"Córdoba","total":9,"ss_ok":6,"dis_ok":6,"con_ok":6,"km_total":12.8},{"Departamento":"Huila","total":51,"ss_ok":46,"dis_ok":38,"con_ok":14,"km_total":212.2},{"Departamento":"Meta","total":10,"ss_ok":5,"dis_ok":5,"con_ok":2,"km_total":35.2},{"Departamento":"Nariño","total":2,"ss_ok":0,"dis_ok":0,"con_ok":0,"km_total":7.6},{"Departamento":"Quindío","total":10,"ss_ok":8,"dis_ok":5,"con_ok":0,"km_total":33.1},{"Departamento":"Risaralda","total":1,"ss_ok":0,"dis_ok":0,"con_ok":0,"km_total":0.2},{"Departamento":"Santander","total":1,"ss_ok":0,"dis_ok":0,"con_ok":0,"km_total":15.3},{"Departamento":"Tolima","total":23,"ss_ok":14,"dis_ok":10,"con_ok":9,"km_total":90.1},{"Departamento":"Valle del Cauca","total":1,"ss_ok":0,"dis_ok":0,"con_ok":0,"km_total":0.4}],"detalle":[{"ID Benef":20214,"Nombre IE Beneficiaria":"C.E.R. Montañes Abajo","Regional":"Andina","Departamento":"Antioquia","Municipio":"Guarne","Operador":"Tigo","Estado":"Construcción","Distancia_m":2219},{"ID Benef":38555,"Nombre IE Beneficiaria":"Escuela Mesetas Bajas","Regional":"Sur","Departamento":"Meta","Municipio":"Villavicencio","Operador":"Telefónica","Estado":"Construcción","Distancia_m":2183},{"ID Benef":20534,"Nombre IE Beneficiaria":"C.E.R. Obdulio Duque","Regional":"Andina","Departamento":"Antioquia","Municipio":"Marinilla","Operador":"Tigo","Estado":"Construcción","Distancia_m":6945},{"ID Benef":19098,"Nombre IE Beneficiaria":"Centro Educativo Rural Altamira","Regional":"Andina","Departamento":"Antioquia","Municipio":"Barbosa","Operador":"Tigo","Estado":"Construcción","Distancia_m":3000},{"ID Benef":19066,"Nombre IE Beneficiaria":"Centro Educativo Rural El Tigre","Regional":"Andina","Departamento":"Antioquia","Municipio":"Barbosa","Operador":"Tigo","Estado":"Construcción","Distancia_m":4655},{"ID Benef":20529,"Nombre IE Beneficiaria":"E.R. Marcos Ossa García","Regional":"Andina","Departamento":"Antioquia","Municipio":"Marinilla","Operador":"Tigo","Estado":"Construcción","Distancia_m":682},{"ID Benef":20515,"Nombre IE Beneficiaria":"I.E.R. Francisco Manzueto Giraldo","Regional":"Andina","Departamento":"Antioquia","Municipio":"Marinilla","Operador":"Tigo","Estado":"Construcción","Distancia_m":1935},{"ID Benef":10689,"Nombre IE Beneficiaria":"Instituto Técnico de Marinilla","Regional":"Andina","Departamento":"Antioquia","Municipio":"Marinilla","Operador":"Tigo","Estado":"Construcción","Distancia_m":425},{"ID Benef":20531,"Nombre IE Beneficiaria":"C.E.R. Santa Cruz","Regional":"Andina","Departamento":"Antioquia","Municipio":"Marinilla","Operador":"Tigo","Estado":"Construcción","Distancia_m":4303},{"ID Benef":31386,"Nombre IE Beneficiaria":"I.E. San José del Quemado","Regional":"Norte","Departamento":"Córdoba","Municipio":"Cerete","Operador":"Tigo","Estado":"Construcción","Distancia_m":180},{"ID Benef":11011,"Nombre IE Beneficiaria":"Escuela Rural Mixta El Claval","Regional":"Norte","Departamento":"Córdoba","Municipio":"Monteria","Operador":"Tigo","Estado":"Construcción","Distancia_m":5253},{"ID Benef":74758,"Nombre IE Beneficiaria":"Centro de Internamiento IPSICOL","Regional":"Norte","Departamento":"Córdoba","Municipio":"Cerete","Operador":"Tigo","Estado":"Construcción","Distancia_m":242},{"ID Benef":20530,"Nombre IE Beneficiaria":"C.E.R. Yarumos","Regional":"Andina","Departamento":"Antioquia","Municipio":"Marinilla","Operador":"Tigo","Estado":"Construcción","Distancia_m":4338},{"ID Benef":17091,"Nombre IE Beneficiaria":"Manuela Beltrán","Regional":"Sur","Departamento":"Tolima","Municipio":"Coyaima","Operador":"Tigo","Estado":"Construcción","Distancia_m":21},{"ID Benef":17092,"Nombre IE Beneficiaria":"Juan de Borja","Regional":"Sur","Departamento":"Tolima","Municipio":"Coyaima","Operador":"Tigo","Estado":"Construcción","Distancia_m":1050},{"ID Benef":14677,"Nombre IE Beneficiaria":"Fernando Monje Casanova","Regional":"Sur","Departamento":"Huila","Municipio":"Yaguara","Operador":"Telefónica","Estado":"Construcción","Distancia_m":1232},{"ID Benef":14645,"Nombre IE Beneficiaria":"Siloé","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Construcción","Distancia_m":329},{"ID Benef":14642,"Nombre IE Beneficiaria":"Misael Pastrana Borrero","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Construcción","Distancia_m":460},{"ID Benef":14640,"Nombre IE Beneficiaria":"San Martin","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Construcción","Distancia_m":156},{"ID Benef":14646,"Nombre IE Beneficiaria":"Central","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Construcción","Distancia_m":201},{"ID Benef":37221,"Nombre IE Beneficiaria":"La Florida","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Construcción","Distancia_m":3417},{"ID Benef":37265,"Nombre IE Beneficiaria":"La Chaquira","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Construcción","Distancia_m":4843},{"ID Benef":37201,"Nombre IE Beneficiaria":"La Estrella","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Construcción","Distancia_m":1831},{"ID Benef":37276,"Nombre IE Beneficiaria":"La Antigua","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Construcción","Distancia_m":858},{"ID Benef":37266,"Nombre IE Beneficiaria":"Timanco","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Construcción","Distancia_m":1209},{"ID Benef":14596,"Nombre IE Beneficiaria":"Eduardo Santos","Regional":"Sur","Departamento":"Huila","Municipio":"Palermo","Operador":"Telefónica","Estado":"Construcción","Distancia_m":19},{"ID Benef":14602,"Nombre IE Beneficiaria":"Camilo Tor. Restrepo","Regional":"Sur","Departamento":"Huila","Municipio":"Palermo","Operador":"Telefónica","Estado":"Construcción","Distancia_m":234},{"ID Benef":14600,"Nombre IE Beneficiaria":"Mi Pequeño Mundo","Regional":"Sur","Departamento":"Huila","Municipio":"Palermo","Operador":"Telefónica","Estado":"Construcción","Distancia_m":20},{"ID Benef":14594,"Nombre IE Beneficiaria":"Benjamín Perez Ramírez","Regional":"Sur","Departamento":"Huila","Municipio":"Palermo","Operador":"Telefónica","Estado":"Construcción","Distancia_m":679},{"ID Benef":38549,"Nombre IE Beneficiaria":"Liceo General Serviez","Regional":"Sur","Departamento":"Meta","Municipio":"Villavicencio","Operador":"Telefónica","Estado":"Construcción","Distancia_m":1620},{"ID Benef":31016,"Nombre IE Beneficiaria":"Esc Rur Mix de Arenal","Regional":"Norte","Departamento":"Córdoba","Municipio":"Monteria","Operador":"Tigo","Estado":"Construcción","Distancia_m":4820},{"ID Benef":31408,"Nombre IE Beneficiaria":"C.E. Isla Blanca","Regional":"Norte","Departamento":"Córdoba","Municipio":"Cerete","Operador":"Tigo","Estado":"Construcción","Distancia_m":426},{"ID Benef":17245,"Nombre IE Beneficiaria":"Laura María Zarate Gil","Regional":"Sur","Departamento":"Tolima","Municipio":"Rovira","Operador":"Tigo","Estado":"Construcción","Distancia_m":84},{"ID Benef":74757,"Nombre IE Beneficiaria":"Esc Rural Mixta California","Regional":"Norte","Departamento":"Córdoba","Municipio":"Monteria","Operador":"Tigo","Estado":"Construcción","Distancia_m":131},{"ID Benef":17244,"Nombre IE Beneficiaria":"General Santander","Regional":"Sur","Departamento":"Tolima","Municipio":"Rovira","Operador":"Tigo","Estado":"Construcción","Distancia_m":170},{"ID Benef":17261,"Nombre IE Beneficiaria":"Carolita","Regional":"Sur","Departamento":"Tolima","Municipio":"San Luis","Operador":"Tigo","Estado":"Construcción","Distancia_m":878},{"ID Benef":17057,"Nombre IE Beneficiaria":"Nuestra Señora de Lourdes","Regional":"Sur","Departamento":"Tolima","Municipio":"Ataco","Operador":"Tigo","Estado":"Construcción","Distancia_m":625},{"ID Benef":17056,"Nombre IE Beneficiaria":"Camilo Torres","Regional":"Sur","Departamento":"Tolima","Municipio":"Ataco","Operador":"Tigo","Estado":"Construcción","Distancia_m":17},{"ID Benef":17246,"Nombre IE Beneficiaria":"Marco Manuel Ruiz","Regional":"Sur","Departamento":"Tolima","Municipio":"Rovira","Operador":"Tigo","Estado":"Construcción","Distancia_m":686},{"ID Benef":17247,"Nombre IE Beneficiaria":"La Ceiba 2","Regional":"Sur","Departamento":"Tolima","Municipio":"Rovira","Operador":"Tigo","Estado":"Construcción","Distancia_m":1569},{"ID Benef":20521,"Nombre IE Beneficiaria":"C.E.R. Joaquín Guillermo González","Regional":"Andina","Departamento":"Antioquia","Municipio":"Marinilla","Operador":"Tigo","Estado":"Construcción","Distancia_m":5766},{"ID Benef":37313,"Nombre IE Beneficiaria":"La Esperanza","Regional":"Sur","Departamento":"Huila","Municipio":"Santa Maria","Operador":"Telefónica","Estado":"Diseño","Distancia_m":342},{"ID Benef":37227,"Nombre IE Beneficiaria":"El Playón","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Diseño","Distancia_m":628},{"ID Benef":37304,"Nombre IE Beneficiaria":"El Briceño","Regional":"Sur","Departamento":"Huila","Municipio":"Santa Maria","Operador":"Telefónica","Estado":"Diseño","Distancia_m":2378},{"ID Benef":14568,"Nombre IE Beneficiaria":"Central Urbana","Regional":"Sur","Departamento":"Huila","Municipio":"Guadalupe","Operador":"Telefónica","Estado":"Diseño","Distancia_m":342},{"ID Benef":14648,"Nombre IE Beneficiaria":"Simón Bolívar","Regional":"Sur","Departamento":"Huila","Municipio":"Santa Maria","Operador":"Telefónica","Estado":"Diseño","Distancia_m":195},{"ID Benef":36946,"Nombre IE Beneficiaria":"Resguardo Indígena Bache","Regional":"Sur","Departamento":"Huila","Municipio":"Palermo","Operador":"Telefónica","Estado":"Diseño","Distancia_m":17531},{"ID Benef":37277,"Nombre IE Beneficiaria":"El Barniz","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Diseño","Distancia_m":1554},{"ID Benef":16020,"Nombre IE Beneficiaria":"Guillermo Ángel Ángel","Regional":"Sur","Departamento":"Quindío","Municipio":"Genova","Operador":"Tigo","Estado":"Diseño","Distancia_m":248},{"ID Benef":16023,"Nombre IE Beneficiaria":"Antonia Santos","Regional":"Sur","Departamento":"Quindío","Municipio":"Genova","Operador":"Tigo","Estado":"Diseño","Distancia_m":308},{"ID Benef":43901,"Nombre IE Beneficiaria":"José Antonio Galán","Regional":"Sur","Departamento":"Quindío","Municipio":"Genova","Operador":"Tigo","Estado":"Diseño","Distancia_m":2215},{"ID Benef":37306,"Nombre IE Beneficiaria":"Sinaí","Regional":"Sur","Departamento":"Huila","Municipio":"Santa Maria","Operador":"Telefónica","Estado":"Diseño","Distancia_m":2949},{"ID Benef":37281,"Nombre IE Beneficiaria":"Los Andes","Regional":"Sur","Departamento":"Huila","Municipio":"San Agustin","Operador":"Telefónica","Estado":"Diseño","Distancia_m":2107},{"ID Benef":36209,"Nombre IE Beneficiaria":"La María","Regional":"Sur","Departamento":"Huila","Municipio":"Agrado","Operador":"Telefónica","Estado":"Diseño","Distancia_m":349},{"ID Benef":37302,"Nombre IE Beneficiaria":"Las Mercedes","Regional":"Sur","Departamento":"Huila","Municipio":"Santa Maria","Operador":"Telefónica","Estado":"Diseño","Distancia_m":2921},{"ID Benef":36963,"Nombre IE Beneficiaria":"Fundador","Regional":"Sur","Departamento":"Huila","Municipio":"Palestina","Operador":"Telefónica","Estado":"Diseño","Distancia_m":2151},{"ID Benef":36211,"Nombre IE Beneficiaria":"El Astillero","Regional":"Sur","Departamento":"Huila","Municipio":"Agrado","Operador":"Telefónica","Estado":"Diseño","Distancia_m":150},{"ID Benef":36924,"Nombre IE Beneficiaria":"Juncal","Regional":"Sur","Departamento":"Huila","Municipio":"Palermo","Operador":"Telefónica","Estado":"Diseño","Distancia_m":12649},{"ID Benef":43819,"Nombre IE Beneficiaria":"La Divisa","Regional":"Sur","Departamento":"Quindío","Municipio":"Calarca","Operador":"Tigo","Estado":"Diseño","Distancia_m":24},{"ID Benef":43823,"Nombre IE Beneficiaria":"Teresa Giraldo Galindo","Regional":"Sur","Departamento":"Quindío","Municipio":"Calarca","Operador":"Tigo","Estado":"Diseño","Distancia_m":3849},{"ID Benef":36203,"Nombre IE Beneficiaria":"San Antonio","Regional":"Sur","Departamento":"Huila","Municipio":"Agrado","Operador":"Telefónica","Estado":"Diseño","Distancia_m":1678},{"ID Benef":36999,"Nombre IE Beneficiaria":"Peña Negra","Regional":"Sur","Departamento":"Huila","Municipio":"Pital","Operador":"Telefónica","Estado":"Diseño","Distancia_m":20},{"ID Benef":36984,"Nombre IE Beneficiaria":"Flor Amarillo","Regional":"Sur","Departamento":"Huila","Municipio":"Pital","Operador":"Telefónica","Estado":"Diseño","Distancia_m":2404},{"ID Benef":14577,"Nombre IE Beneficiaria":"Alto Brisas","Regional":"Sur","Departamento":"Huila","Municipio":"Isnos","Operador":"Telefónica","Estado":"Diseño","Distancia_m":6726},{"ID Benef":36654,"Nombre IE Beneficiaria":"Campoalegre","Regional":"Sur","Departamento":"Huila","Municipio":"Isnos","Operador":"Telefónica","Estado":"Diseño","Distancia_m":9583},{"ID Benef":36682,"Nombre IE Beneficiaria":"Bellavista","Regional":"Sur","Departamento":"Huila","Municipio":"Isnos","Operador":"Telefónica","Estado":"Diseño","Distancia_m":1272},{"ID Benef":74762,"Nombre IE Beneficiaria":"Regulo suarez","Regional":"Sur","Departamento":"Huila","Municipio":"Paicol","Operador":"Telefónica","Estado":"Diseño","Distancia_m":361},{"ID Benef":36997,"Nombre IE Beneficiaria":"El Retiro","Regional":"Sur","Departamento":"Huila","Municipio":"Pital","Operador":"Telefónica","Estado":"Diseño","Distancia_m":8484},{"ID Benef":37003,"Nombre IE Beneficiaria":"Mesitas","Regional":"Sur","Departamento":"Huila","Municipio":"Tarquí","Operador":"Telefónica","Estado":"Diseño","Distancia_m":11975},{"ID Benef":14637,"Nombre IE Beneficiaria":"Villa del Prado","Regional":"Sur","Departamento":"Huila","Municipio":"Rivera","Operador":"Telefónica","Estado":"Diseño","Distancia_m":1174},{"ID Benef":15240,"Nombre IE Beneficiaria":"Sede Principal Lejanías","Regional":"Sur","Departamento":"Meta","Municipio":"Lejanias","Operador":"Telefónica","Estado":"Diseño","Distancia_m":755},{"ID Benef":15265,"Nombre IE Beneficiaria":"Sede Subteniente Saturnino","Regional":"Sur","Departamento":"Meta","Municipio":"San Juan de Arama","Operador":"Telefónica","Estado":"Diseño","Distancia_m":728},{"ID Benef":15266,"Nombre IE Beneficiaria":"Sede Principal San Juan de Arama","Regional":"Sur","Departamento":"Meta","Municipio":"San Juan de Arama","Operador":"Telefónica","Estado":"Diseño","Distancia_m":696},{"ID Benef":49456,"Nombre IE Beneficiaria":"Campoalegre (Nueva)","Regional":"Sur","Departamento":"Tolima","Municipio":"San Luis","Operador":"Tigo","Estado":"Diseño","Distancia_m":8872},{"ID Benef":37014,"Nombre IE Beneficiaria":"Alto San Isidro","Regional":"Sur","Departamento":"Huila","Municipio":"Pital","Operador":"Telefónica","Estado":"Site Survey","Distancia_m":1314},{"ID Benef":74759,"Nombre IE Beneficiaria":"Villa Mercedes","Regional":"Sur","Departamento":"Huila","Municipio":"Pital","Operador":"Telefónica","Estado":"Site Survey","Distancia_m":12523},{"ID Benef":36998,"Nombre IE Beneficiaria":"Playa Rica","Regional":"Sur","Departamento":"Huila","Municipio":"Pital","Operador":"Telefónica","Estado":"Site Survey","Distancia_m":7829},{"ID Benef":43816,"Nombre IE Beneficiaria":"La Paloma","Regional":"Sur","Departamento":"Quindío","Municipio":"Calarca","Operador":"Tigo","Estado":"Site Survey","Distancia_m":3546},{"ID Benef":37004,"Nombre IE Beneficiaria":"Monserrate","Regional":"Sur","Departamento":"Huila","Municipio":"Pital","Operador":"Telefónica","Estado":"Site Survey","Distancia_m":23497},{"ID Benef":36217,"Nombre IE Beneficiaria":"Alto Granadillo","Regional":"Sur","Departamento":"Huila","Municipio":"Agrado","Operador":"Telefónica","Estado":"Site Survey","Distancia_m":21346},{"ID Benef":36215,"Nombre IE Beneficiaria":"Las Orquídeas","Regional":"Sur","Departamento":"Huila","Municipio":"Agrado","Operador":"Telefónica","Estado":"Site Survey","Distancia_m":831},{"ID Benef":43837,"Nombre IE Beneficiaria":"Calabazo Bajo","Regional":"Sur","Departamento":"Quindío","Municipio":"Calarca","Operador":"Tigo","Estado":"Site Survey","Distancia_m":9653},{"ID Benef":36216,"Nombre IE Beneficiaria":"El Horizonte","Regional":"Sur","Departamento":"Huila","Municipio":"Agrado","Operador":"Telefónica","Estado":"Site Survey","Distancia_m":5245},{"ID Benef":43812,"Nombre IE Beneficiaria":"Planadas","Regional":"Sur","Departamento":"Quindío","Municipio":"Calarca","Operador":"Tigo","Estado":"Site Survey","Distancia_m":13066},{"ID Benef":18625,"Nombre IE Beneficiaria":"Olaya Herrera","Regional":"Andina","Departamento":"Antioquia","Municipio":"Amaga","Operador":"Tigo","Estado":"Site Survey","Distancia_m":2078},{"ID Benef":37356,"Nombre IE Beneficiaria":"Brazuelito","Regional":"Sur","Departamento":"Huila","Municipio":"Suaza","Operador":"Telefónica","Estado":"Site Survey","Distancia_m":4467},{"ID Benef":17048,"Nombre IE Beneficiaria":"El Alto","Regional":"Sur","Departamento":"Tolima","Municipio":"Ambalema","Operador":"Tigo","Estado":"Site Survey","Distancia_m":891},{"ID Benef":17044,"Nombre IE Beneficiaria":"Egidio Ponce","Regional":"Sur","Departamento":"Tolima","Municipio":"Ambalema","Operador":"Tigo","Estado":"Site Survey","Distancia_m":906},{"ID Benef":17264,"Nombre IE Beneficiaria":"Antonio Nariño","Regional":"Sur","Departamento":"Tolima","Municipio":"Santa Isabel","Operador":"Tigo","Estado":"Site Survey","Distancia_m":572},{"ID Benef":17263,"Nombre IE Beneficiaria":"Santa Teresita del Niño Jesus","Regional":"Sur","Departamento":"Tolima","Municipio":"Santa Isabel","Operador":"Tigo","Estado":"Site Survey","Distancia_m":203},{"ID Benef":17043,"Nombre IE Beneficiaria":"Aminta y Everardo","Regional":"Sur","Departamento":"Tolima","Municipio":"Alvarado","Operador":"Tigo","Estado":"En Proceso","Distancia_m":1387},{"ID Benef":16054,"Nombre IE Beneficiaria":"Carlos Lleras","Regional":"Sur","Departamento":"Quindío","Municipio":"Salento","Operador":"Tigo","Estado":"En Proceso","Distancia_m":186},{"ID Benef":16040,"Nombre IE Beneficiaria":"María Auxiliadora","Regional":"Sur","Departamento":"Quindío","Municipio":"Pijao","Operador":"Tigo","Estado":"En Proceso","Distancia_m":33},{"ID Benef":74773,"Nombre IE Beneficiaria":"Techitos","Regional":"Sur","Departamento":"Tolima","Municipio":"Ortega","Operador":"Tigo","Estado":"En Proceso","Distancia_m":540},{"ID Benef":18279,"Nombre IE Beneficiaria":"Jesus Bernal Pinzón","Regional":"Sur","Departamento":"Casanare","Municipio":"Mani","Operador":"Tigo","Estado":"En Proceso","Distancia_m":67},{"ID Benef":18281,"Nombre IE Beneficiaria":"Jard Inf Travesuras Infantiles","Regional":"Sur","Departamento":"Casanare","Municipio":"Mani","Operador":"Tigo","Estado":"En Proceso","Distancia_m":666},{"ID Benef":18278,"Nombre IE Beneficiaria":"Santa Teresa","Regional":"Sur","Departamento":"Casanare","Municipio":"Mani","Operador":"Tigo","Estado":"En Proceso","Distancia_m":678},{"ID Benef":18280,"Nombre IE Beneficiaria":"La Esperanza","Regional":"Sur","Departamento":"Casanare","Municipio":"Mani","Operador":"Tigo","Estado":"En Proceso","Distancia_m":1773},{"ID Benef":36231,"Nombre IE Beneficiaria":"Dindal","Regional":"Sur","Departamento":"Huila","Municipio":"Aipe","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":525},{"ID Benef":52258,"Nombre IE Beneficiaria":"Macuco","Regional":"Sur","Departamento":"Casanare","Municipio":"Mani","Operador":"Tigo","Estado":"En Proceso","Distancia_m":17316},{"ID Benef":18142,"Nombre IE Beneficiaria":"Cristóbal Colón","Regional":"Sur","Departamento":"Arauca","Municipio":"Puerto Rondon","Operador":"Tigo","Estado":"En Proceso","Distancia_m":375},{"ID Benef":16220,"Nombre IE Beneficiaria":"SE Simón Bolívar","Regional":"Sur","Departamento":"Risaralda","Municipio":"Pueblo Rico","Operador":"Tigo","Estado":"En Proceso","Distancia_m":244},{"ID Benef":21677,"Nombre IE Beneficiaria":"C.E.R. Llanadas Santa Clara","Regional":"Andina","Departamento":"Antioquia","Municipio":"Sonson","Operador":"Tigo","Estado":"En Proceso","Distancia_m":8745},{"ID Benef":39266,"Nombre IE Beneficiaria":"Sede El Turpial","Regional":"Sur","Departamento":"Meta","Municipio":"Puerto Lleras","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":4576},{"ID Benef":15255,"Nombre IE Beneficiaria":"Sede Principal Majestuoso Ariari","Regional":"Sur","Departamento":"Meta","Municipio":"Puerto Lleras","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":1006},{"ID Benef":74785,"Nombre IE Beneficiaria":"Sede E.R. Rafael Pombo","Regional":"Sur","Departamento":"Meta","Municipio":"Puerto Rico","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":1372},{"ID Benef":74793,"Nombre IE Beneficiaria":"Sede Las Leonas","Regional":"Sur","Departamento":"Meta","Municipio":"Puerto Lopez","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":4524},{"ID Benef":36846,"Nombre IE Beneficiaria":"La Cabaña","Regional":"Sur","Departamento":"Huila","Municipio":"Nataga","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":2784},{"ID Benef":36843,"Nombre IE Beneficiaria":"Laureles","Regional":"Sur","Departamento":"Huila","Municipio":"Nataga","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":3844},{"ID Benef":48887,"Nombre IE Beneficiaria":"Esc El Vergel","Regional":"Sur","Departamento":"Tolima","Municipio":"Ortega","Operador":"Tigo","Estado":"En Proceso","Distancia_m":33},{"ID Benef":31727,"Nombre IE Beneficiaria":"Esc R. Varones de Sabaneta","Regional":"Norte","Departamento":"Córdoba","Municipio":"Momil","Operador":"Tigo","Estado":"En Proceso","Distancia_m":281},{"ID Benef":31740,"Nombre IE Beneficiaria":"San Pedro Claver","Regional":"Norte","Departamento":"Córdoba","Municipio":"Momil","Operador":"Tigo","Estado":"En Proceso","Distancia_m":1096},{"ID Benef":18063,"Nombre IE Beneficiaria":"La Inmaculada","Regional":"Sur","Departamento":"Valle del Cauca","Municipio":"Versalles","Operador":"Tigo","Estado":"En Proceso","Distancia_m":352},{"ID Benef":17239,"Nombre IE Beneficiaria":"Manuela Beltrán","Regional":"Sur","Departamento":"Tolima","Municipio":"Rioblanco","Operador":"Tigo","Estado":"En Proceso","Distancia_m":186},{"ID Benef":36855,"Nombre IE Beneficiaria":"Buenavista","Regional":"Sur","Departamento":"Huila","Municipio":"Nataga","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":6773},{"ID Benef":48619,"Nombre IE Beneficiaria":"Gabriela Mistral","Regional":"Sur","Departamento":"Tolima","Municipio":"Herveo","Operador":"Tigo","Estado":"En Proceso","Distancia_m":20168},{"ID Benef":48820,"Nombre IE Beneficiaria":"Veraguas","Regional":"Sur","Departamento":"Tolima","Municipio":"Melgar","Operador":"Tigo","Estado":"En Proceso","Distancia_m":6067},{"ID Benef":49167,"Nombre IE Beneficiaria":"San Francisco","Regional":"Sur","Departamento":"Tolima","Municipio":"Rioblanco","Operador":"Tigo","Estado":"En Proceso","Distancia_m":12133},{"ID Benef":48879,"Nombre IE Beneficiaria":"El Triunfo","Regional":"Sur","Departamento":"Tolima","Municipio":"Ortega","Operador":"Tigo","Estado":"En Proceso","Distancia_m":15129},{"ID Benef":48985,"Nombre IE Beneficiaria":"Lucerito Alto","Regional":"Sur","Departamento":"Tolima","Municipio":"Ortega","Operador":"Tigo","Estado":"En Proceso","Distancia_m":17908},{"ID Benef":46634,"Nombre IE Beneficiaria":"Escuela Rural Borneo","Regional":"Andina","Departamento":"Santander","Municipio":"San Vicente de Chucuri","Operador":"Tigo","Estado":"En Proceso","Distancia_m":15319},{"ID Benef":41728,"Nombre IE Beneficiaria":"Sede # 3 Vaquerio Carretera","Regional":"Sur","Departamento":"Nariño","Municipio":"San Andres de Tumaco","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":2823},{"ID Benef":31032,"Nombre IE Beneficiaria":"Esc Rur Mix San Martin","Regional":"Norte","Departamento":"Córdoba","Municipio":"Monteria","Operador":"Tigo","Estado":"En Proceso","Distancia_m":334},{"ID Benef":28076,"Nombre IE Beneficiaria":"El Diviso","Regional":"Sur","Departamento":"Cauca","Municipio":"Balboa","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":2818},{"ID Benef":55200,"Nombre IE Beneficiaria":"Nuestra Sra. de Fátima","Regional":"Sur","Departamento":"Nariño","Municipio":"Cordoba","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":4826},{"ID Benef":74734,"Nombre IE Beneficiaria":"Cantarito","Regional":"Sur","Departamento":"Cauca","Municipio":"Villa Rica","Operador":"Tigo","Estado":"En Proceso","Distancia_m":3848},{"ID Benef":37365,"Nombre IE Beneficiaria":"Vergel Cabildo","Regional":"Sur","Departamento":"Huila","Municipio":"Suaza","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":15788},{"ID Benef":74782,"Nombre IE Beneficiaria":"Indostán","Regional":"Sur","Departamento":"Meta","Municipio":"Villavicencio","Operador":"Telefónica","Estado":"En Proceso","Distancia_m":17755}]};
 
-                }
-            );
-            L.control.scale().addTo(map_3a6d12ff4f08af77eb614bff89ed6448);
+// ─── STATE ───────────────────────────────────────────────
+let filtered = [...RAW.detalle];
+let charts = {};
 
-            
-
-        
-    
-            var tile_layer_a6dd15bfb1b97d0955e2370b1aefd7ea = L.tileLayer(
-                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-                {
-  "minZoom": 0,
-  "maxZoom": 20,
-  "maxNativeZoom": 20,
-  "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
-  "subdomains": "abcd",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_a6dd15bfb1b97d0955e2370b1aefd7ea.addTo(map_3a6d12ff4f08af77eb614bff89ed6448);
-        
-    
-            var measure_control_45f2dcb302fa781ab7a3650b92ffb5a9 = new L.Control.Measure(
-                {
-  "position": "bottomleft",
-  "primaryLengthUnit": "kilometers",
-  "secondaryLengthUnit": "miles",
-  "primaryAreaUnit": "sqmeters",
-  "secondaryAreaUnit": "acres",
-});
-            map_3a6d12ff4f08af77eb614bff89ed6448.addControl(measure_control_45f2dcb302fa781ab7a3650b92ffb5a9);
-
-            // Workaround for using this plugin with Leaflet>=1.8.0
-            // https://github.com/ljagis/leaflet-measure/issues/171
-            L.Control.Measure.include({
-                _setCaptureMarkerIcon: function () {
-                    // disable autopan
-                    this._captureMarker.options.autoPanOnFocus = false;
-                    // default function
-                    this._captureMarker.setIcon(
-                        L.divIcon({
-                            iconSize: this._map.getSize().multiplyBy(2)
-                        })
-                    );
-                },
-            });
-
-        
-    
-            var feature_group_c71f11ea1149528b6948f4ca2ae1ce03 = L.featureGroup(
-                {
-}
-            );
-        
-    
-            var marker_cluster_eead6514a0c96a24a242269ae6437690 = L.markerClusterGroup(
-                {
-}
-            );
-        
-    
-            var marker_23c4cbebb243fc0c9b3530080b0420e2 = L.marker(
-                [4.626593428306023, -74.1114518320612],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_55a739adbecb413a6341ea13abf10705 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_0f58958b54f75f554aacf8a2d96c9e3f = L.popup({
-  "maxWidth": 300,
+// ─── INIT ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  populateDeptoFilter();
+  renderAll();
 });
 
-        
-            
-                var html_19ba787b6ce2c8631fd7d60208466b05 = $(`<div id="html_19ba787b6ce2c8631fd7d60208466b05" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 DELICIAS MUZU             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 39 SUR No 51D-19<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_0f58958b54f75f554aacf8a2d96c9e3f.setContent(html_19ba787b6ce2c8631fd7d60208466b05);
-            
-        
-
-        marker_23c4cbebb243fc0c9b3530080b0420e2.bindPopup(popup_0f58958b54f75f554aacf8a2d96c9e3f)
-        ;
-
-        
-    
-    
-            marker_23c4cbebb243fc0c9b3530080b0420e2.bindTooltip(
-                `<div>
-                     DELICIAS MUZU
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_23c4cbebb243fc0c9b3530080b0420e2.setIcon(icon_55a739adbecb413a6341ea13abf10705);
-            
-    
-            var marker_f9406ed270941c85e1e812c7ec731095 = L.marker(
-                [4.625323471397658, -74.11287016456083],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_28714f0c0cd89a92b5af2f777de3a914 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_5703b87dc703b4f6a0e19e560216dd7c = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_0d19cefd7d52a9737a2708c1447f56cc = $(`<div id="html_0d19cefd7d52a9737a2708c1447f56cc" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 CIUDAD MONTES             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 51  #  16 - 64 SUR<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_5703b87dc703b4f6a0e19e560216dd7c.setContent(html_0d19cefd7d52a9737a2708c1447f56cc);
-            
-        
-
-        marker_f9406ed270941c85e1e812c7ec731095.bindPopup(popup_5703b87dc703b4f6a0e19e560216dd7c)
-        ;
-
-        
-    
-    
-            marker_f9406ed270941c85e1e812c7ec731095.bindTooltip(
-                `<div>
-                     CIUDAD MONTES
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_f9406ed270941c85e1e812c7ec731095.setIcon(icon_28714f0c0cd89a92b5af2f777de3a914);
-            
-    
-            var marker_cbc628ba8042d80e58cf3248016e1ca4 = L.marker(
-                [4.626895377076202, -74.11345384400062],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_f48861109f33375e2585458edfcf6f66 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_b67f139b1a6782dae5c259b3c27f4f99 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_8d0d3fca401abd39d34e1e0a806f6623 = $(`<div id="html_8d0d3fca401abd39d34e1e0a806f6623" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SANTA MATILDE             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 1 No 34B - 20 / CLL 1B  No 35-20<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_b67f139b1a6782dae5c259b3c27f4f99.setContent(html_8d0d3fca401abd39d34e1e0a806f6623);
-            
-        
-
-        marker_cbc628ba8042d80e58cf3248016e1ca4.bindPopup(popup_b67f139b1a6782dae5c259b3c27f4f99)
-        ;
-
-        
-    
-    
-            marker_cbc628ba8042d80e58cf3248016e1ca4.bindTooltip(
-                `<div>
-                     SANTA MATILDE
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_cbc628ba8042d80e58cf3248016e1ca4.setIcon(icon_f48861109f33375e2585458edfcf6f66);
-            
-    
-            var marker_44382764b71edf2cb2826c4a9f28639b = L.marker(
-                [4.628646059712817, -74.11087664742232],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_9e9f71974334577dc4af5841ea6391c7 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_2efafd665df72fa376e85054ed04fb56 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_39ca6ffe18b67ef78e17943f9f30ae3b = $(`<div id="html_39ca6ffe18b67ef78e17943f9f30ae3b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 LA ASUNCION             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 32 B  # 1D-21<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_2efafd665df72fa376e85054ed04fb56.setContent(html_39ca6ffe18b67ef78e17943f9f30ae3b);
-            
-        
-
-        marker_44382764b71edf2cb2826c4a9f28639b.bindPopup(popup_2efafd665df72fa376e85054ed04fb56)
-        ;
-
-        
-    
-    
-            marker_44382764b71edf2cb2826c4a9f28639b.bindTooltip(
-                `<div>
-                     LA ASUNCION
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_44382764b71edf2cb2826c4a9f28639b.setIcon(icon_9e9f71974334577dc4af5841ea6391c7);
-            
-    
-            var marker_acd3cf9b5cb6f48fb09b9b6db647af5a = L.marker(
-                [4.6251316932505535, -74.110038000955],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_31d932e63cb6a70be82995a7f1ac4ece = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_9bac7782eba35717b482bc7399a62ba0 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_3d7c52fa714ef42421b1c80bc7ff50d9 = $(`<div id="html_3d7c52fa714ef42421b1c80bc7ff50d9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 ALCALDIA PUENTE ARANDA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 31 D #  04 - 43<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_9bac7782eba35717b482bc7399a62ba0.setContent(html_3d7c52fa714ef42421b1c80bc7ff50d9);
-            
-        
-
-        marker_acd3cf9b5cb6f48fb09b9b6db647af5a.bindPopup(popup_9bac7782eba35717b482bc7399a62ba0)
-        ;
-
-        
-    
-    
-            marker_acd3cf9b5cb6f48fb09b9b6db647af5a.bindTooltip(
-                `<div>
-                     ALCALDIA PUENTE ARANDA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_acd3cf9b5cb6f48fb09b9b6db647af5a.setIcon(icon_31d932e63cb6a70be82995a7f1ac4ece);
-            
-    
-            var marker_d51fd5711b2448d9a7a28b2926eaa69d = L.marker(
-                [4.625131726086102, -74.11023743976176],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_bcaefa4ef708e2b6070801cdca9959f4 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_6c362586817a224e3f802e1890219bfd = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_e0c7a8e9a0ba4767eb5a493e5d74c2da = $(`<div id="html_e0c7a8e9a0ba4767eb5a493e5d74c2da" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 LA PRIMAVERA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 41 B # 4C - 27<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_6c362586817a224e3f802e1890219bfd.setContent(html_e0c7a8e9a0ba4767eb5a493e5d74c2da);
-            
-        
-
-        marker_d51fd5711b2448d9a7a28b2926eaa69d.bindPopup(popup_6c362586817a224e3f802e1890219bfd)
-        ;
-
-        
-    
-    
-            marker_d51fd5711b2448d9a7a28b2926eaa69d.bindTooltip(
-                `<div>
-                     LA PRIMAVERA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_d51fd5711b2448d9a7a28b2926eaa69d.setIcon(icon_bcaefa4ef708e2b6070801cdca9959f4);
-            
-    
-            var marker_f8453dbd9423102510088f973e98b681 = L.marker(
-                [4.628758425631015, -74.11377843504644],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_0d4bb5ea27f9613360df6e9e62420157 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_02f046b37b2a8bcddbaf71e857d84686 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_5d873fb93887d0dab2246cb2ea7108ca = $(`<div id="html_5d873fb93887d0dab2246cb2ea7108ca" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 CUNDINAMARCA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 19 C # 33-30<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_02f046b37b2a8bcddbaf71e857d84686.setContent(html_5d873fb93887d0dab2246cb2ea7108ca);
-            
-        
-
-        marker_f8453dbd9423102510088f973e98b681.bindPopup(popup_02f046b37b2a8bcddbaf71e857d84686)
-        ;
-
-        
-    
-    
-            marker_f8453dbd9423102510088f973e98b681.bindTooltip(
-                `<div>
-                     CUNDINAMARCA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_f8453dbd9423102510088f973e98b681.setIcon(icon_0d4bb5ea27f9613360df6e9e62420157);
-            
-    
-            var marker_73f9c25eee283ea54eced60d69bda166 = L.marker(
-                [4.627134869458306, -74.1127184247517],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_5a28dbd5dacfb8f78fa94c650914473a = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_9a8cf71fe2c1b27c1b9ef5bbf8e0dd7a = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_396722fb20bd0cc05726835dd23fafb5 = $(`<div id="html_396722fb20bd0cc05726835dd23fafb5" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 LA FRANCIA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> DIAG 5 F Bis A # 43B-02<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_9a8cf71fe2c1b27c1b9ef5bbf8e0dd7a.setContent(html_396722fb20bd0cc05726835dd23fafb5);
-            
-        
-
-        marker_73f9c25eee283ea54eced60d69bda166.bindPopup(popup_9a8cf71fe2c1b27c1b9ef5bbf8e0dd7a)
-        ;
-
-        
-    
-    
-            marker_73f9c25eee283ea54eced60d69bda166.bindTooltip(
-                `<div>
-                     LA FRANCIA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_73f9c25eee283ea54eced60d69bda166.setIcon(icon_5a28dbd5dacfb8f78fa94c650914473a);
-            
-    
-            var marker_ac0750da6e75e2ed1e4d9e43dc6d1a3f = L.marker(
-                [4.624661051228131, -74.11143747313719],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_ef659128f1cc84ad201a89d89b88dcf1 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_4f2bb08cd9c14bda67591124a3a802a2 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_2f2106e383f75cabb26dc09abbc5a261 = $(`<div id="html_2f2106e383f75cabb26dc09abbc5a261" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 PUENTE ARANDA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 56 # 15- 41<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_4f2bb08cd9c14bda67591124a3a802a2.setContent(html_2f2106e383f75cabb26dc09abbc5a261);
-            
-        
-
-        marker_ac0750da6e75e2ed1e4d9e43dc6d1a3f.bindPopup(popup_4f2bb08cd9c14bda67591124a3a802a2)
-        ;
-
-        
-    
-    
-            marker_ac0750da6e75e2ed1e4d9e43dc6d1a3f.bindTooltip(
-                `<div>
-                     PUENTE ARANDA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_ac0750da6e75e2ed1e4d9e43dc6d1a3f.setIcon(icon_ef659128f1cc84ad201a89d89b88dcf1);
-            
-    
-            var marker_4756efcdb88080c13eab8ba8c0869d6e = L.marker(
-                [4.626685120087172, -74.11014890974576],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_fbf5c496428cbc82dfe8fb76348a9219 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_16baff2bd06173a2b05529c567ba0b4a = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_880a1344aba8828d1d8e655e030539bc = $(`<div id="html_880a1344aba8828d1d8e655e030539bc" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SALAZAR GOMEZ             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 11 # 65B-10<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_16baff2bd06173a2b05529c567ba0b4a.setContent(html_880a1344aba8828d1d8e655e030539bc);
-            
-        
-
-        marker_4756efcdb88080c13eab8ba8c0869d6e.bindPopup(popup_16baff2bd06173a2b05529c567ba0b4a)
-        ;
-
-        
-    
-    
-            marker_4756efcdb88080c13eab8ba8c0869d6e.bindTooltip(
-                `<div>
-                     SALAZAR GOMEZ
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_4756efcdb88080c13eab8ba8c0869d6e.setIcon(icon_fbf5c496428cbc82dfe8fb76348a9219);
-            
-    
-            var marker_dd92c4eeef9c1e5ead38e186df03fcf6 = L.marker(
-                [4.624673164614375, -74.11305834847569],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_b9e6f54929e0c876167eecb061439393 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_255e5fce3f60bff0a6f982a550af2bbf = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_decc2d3ca34ba36fb219ee6826ed4470 = $(`<div id="html_decc2d3ca34ba36fb219ee6826ed4470" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 LA TRINIDAD             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 5 B # 60 - 29<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_255e5fce3f60bff0a6f982a550af2bbf.setContent(html_decc2d3ca34ba36fb219ee6826ed4470);
-            
-        
-
-        marker_dd92c4eeef9c1e5ead38e186df03fcf6.bindPopup(popup_255e5fce3f60bff0a6f982a550af2bbf)
-        ;
-
-        
-    
-    
-            marker_dd92c4eeef9c1e5ead38e186df03fcf6.bindTooltip(
-                `<div>
-                     LA TRINIDAD
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_dd92c4eeef9c1e5ead38e186df03fcf6.setIcon(icon_b9e6f54929e0c876167eecb061439393);
-            
-    
-            var marker_5d9d453b41229d1be3a6cb17b198abf1 = L.marker(
-                [4.62466854049286, -74.11247131795332],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_0fa2b7dc8ce70cabaa380759492a7ce6 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_6f24f49db0979739345fdf12bebadda5 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_d053e6efe160a972d62d43b359442a8a = $(`<div id="html_d053e6efe160a972d62d43b359442a8a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 LA PRADERA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 4 B # 65 - 31<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_6f24f49db0979739345fdf12bebadda5.setContent(html_d053e6efe160a972d62d43b359442a8a);
-            
-        
-
-        marker_5d9d453b41229d1be3a6cb17b198abf1.bindPopup(popup_6f24f49db0979739345fdf12bebadda5)
-        ;
-
-        
-    
-    
-            marker_5d9d453b41229d1be3a6cb17b198abf1.bindTooltip(
-                `<div>
-                     LA PRADERA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_5d9d453b41229d1be3a6cb17b198abf1.setIcon(icon_0fa2b7dc8ce70cabaa380759492a7ce6);
-            
-    
-            var marker_ebee1d757875f6038d981a4181450573 = L.marker(
-                [4.626083924543132, -74.114312669948],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_b366c3b30f6cee67ab1ab5e434763c6e = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_44de5928ae0e1a1a652e0660131bdf58 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_280d72db0fc66b75e1b5d0f34b290ced = $(`<div id="html_280d72db0fc66b75e1b5d0f34b290ced" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 COLON             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 4 # 56 - 03<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_44de5928ae0e1a1a652e0660131bdf58.setContent(html_280d72db0fc66b75e1b5d0f34b290ced);
-            
-        
-
-        marker_ebee1d757875f6038d981a4181450573.bindPopup(popup_44de5928ae0e1a1a652e0660131bdf58)
-        ;
-
-        
-    
-    
-            marker_ebee1d757875f6038d981a4181450573.bindTooltip(
-                `<div>
-                     COLON
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_ebee1d757875f6038d981a4181450573.setIcon(icon_b366c3b30f6cee67ab1ab5e434763c6e);
-            
-    
-            var marker_2afdfd75f7545e97a2ecb3434fcd4b53 = L.marker(
-                [4.621773439510685, -74.11449241324816],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_0f6eb014c3173be7a1d4ed0874a72537 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_c208a29e637ccba2b0041cee106afe1c = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_90abf9d5696ef524400e174e87beb8d6 = $(`<div id="html_90abf9d5696ef524400e174e87beb8d6" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SAN RAFAEL             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 4 F # 53 - 55<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_c208a29e637ccba2b0041cee106afe1c.setContent(html_90abf9d5696ef524400e174e87beb8d6);
-            
-        
-
-        marker_2afdfd75f7545e97a2ecb3434fcd4b53.bindPopup(popup_c208a29e637ccba2b0041cee106afe1c)
-        ;
-
-        
-    
-    
-            marker_2afdfd75f7545e97a2ecb3434fcd4b53.bindTooltip(
-                `<div>
-                     SAN RAFAEL
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_2afdfd75f7545e97a2ecb3434fcd4b53.setIcon(icon_0f6eb014c3173be7a1d4ed0874a72537);
-            
-    
-            var marker_404c9252f240034bfecad1d08ad414ea = L.marker(
-                [4.6221501643349745, -74.1104749483552],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_34f110eec6a1664b23a9f20d1ef69200 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_676faefcc91a8273b821f8dbc2345e6a = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_17b5896146652698c6838db37059d4e8 = $(`<div id="html_17b5896146652698c6838db37059d4e8" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 EL JAZMIN             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 1 H # 40D-13<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_676faefcc91a8273b821f8dbc2345e6a.setContent(html_17b5896146652698c6838db37059d4e8);
-            
-        
-
-        marker_404c9252f240034bfecad1d08ad414ea.bindPopup(popup_676faefcc91a8273b821f8dbc2345e6a)
-        ;
-
-        
-    
-    
-            marker_404c9252f240034bfecad1d08ad414ea.bindTooltip(
-                `<div>
-                     EL JAZMIN
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_404c9252f240034bfecad1d08ad414ea.setIcon(icon_34f110eec6a1664b23a9f20d1ef69200);
-            
-    
-            var marker_808d2f83a3d315bdccdf80b2abb467c9 = L.marker(
-                [4.624475424941519, -74.10938751994286],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_004b02f466ee858268f9e1f9bbf388ff = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_5a84b09dfcff31a414b26e4fd1bb1549 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_36d59f98274267d77eb7ebd022128817 = $(`<div id="html_36d59f98274267d77eb7ebd022128817" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 LA PONDEROSA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 1 B # 52A-02<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_5a84b09dfcff31a414b26e4fd1bb1549.setContent(html_36d59f98274267d77eb7ebd022128817);
-            
-        
-
-        marker_808d2f83a3d315bdccdf80b2abb467c9.bindPopup(popup_5a84b09dfcff31a414b26e4fd1bb1549)
-        ;
-
-        
-    
-    
-            marker_808d2f83a3d315bdccdf80b2abb467c9.bindTooltip(
-                `<div>
-                     LA PONDEROSA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_808d2f83a3d315bdccdf80b2abb467c9.setIcon(icon_004b02f466ee858268f9e1f9bbf388ff);
-            
-    
-            var marker_fb9080ce97a3eb02d00278dc5ff9f67a = L.marker(
-                [4.623574337759331, -74.11224402024315],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_637e7680fc8ae42d14ce85475ef2bc6e = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_f7e0b68df8b5c462af4099f906009591 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_e862b663d3b0ac68f072b318e49a497d = $(`<div id="html_e862b663d3b0ac68f072b318e49a497d" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 GALAN             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 2 BIS # 56A-37<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_f7e0b68df8b5c462af4099f906009591.setContent(html_e862b663d3b0ac68f072b318e49a497d);
-            
-        
-
-        marker_fb9080ce97a3eb02d00278dc5ff9f67a.bindPopup(popup_f7e0b68df8b5c462af4099f906009591)
-        ;
-
-        
-    
-    
-            marker_fb9080ce97a3eb02d00278dc5ff9f67a.bindTooltip(
-                `<div>
-                     GALAN
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_fb9080ce97a3eb02d00278dc5ff9f67a.setIcon(icon_637e7680fc8ae42d14ce85475ef2bc6e);
-            
-    
-            var marker_52c4edf5eef9a637ffb02893428d6b73 = L.marker(
-                [4.626228494665191, -74.11009293420422],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_82260b2632fa8d9b55344bbb3cc984aa = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_590a0e81d2ec0e74a4310732bb9b543a = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_a4dc5fe819a38a7e7541ff664af433df = $(`<div id="html_a4dc5fe819a38a7e7541ff664af433df" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 MILENTA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 52 C # 19A-76 SUR<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_590a0e81d2ec0e74a4310732bb9b543a.setContent(html_a4dc5fe819a38a7e7541ff664af433df);
-            
-        
-
-        marker_52c4edf5eef9a637ffb02893428d6b73.bindPopup(popup_590a0e81d2ec0e74a4310732bb9b543a)
-        ;
-
-        
-    
-    
-            marker_52c4edf5eef9a637ffb02893428d6b73.bindTooltip(
-                `<div>
-                     MILENTA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_52c4edf5eef9a637ffb02893428d6b73.setIcon(icon_82260b2632fa8d9b55344bbb3cc984aa);
-            
-    
-            var marker_7d171f4015285bc6da08dbae75c00683 = L.marker(
-                [4.623783951848958, -74.1113767279499],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_ababafebabb0c2237edbd760411d36c4 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_f0150d32c129fedde862e10608a52ba6 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_d8ba3c10976f88ab9f148081b618ca2a = $(`<div id="html_d8ba3c10976f88ab9f148081b618ca2a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 EL TEJAR             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 52 D # 24-50 SUR<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_f0150d32c129fedde862e10608a52ba6.setContent(html_d8ba3c10976f88ab9f148081b618ca2a);
-            
-        
-
-        marker_7d171f4015285bc6da08dbae75c00683.bindPopup(popup_f0150d32c129fedde862e10608a52ba6)
-        ;
-
-        
-    
-    
-            marker_7d171f4015285bc6da08dbae75c00683.bindTooltip(
-                `<div>
-                     EL TEJAR
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_7d171f4015285bc6da08dbae75c00683.setIcon(icon_ababafebabb0c2237edbd760411d36c4);
-            
-    
-            var marker_2fdb88a4d164ef69f3c185578090ae49 = L.marker(
-                [4.62277539259733, -74.11339023950922],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_f558c80df236661cbd980763e0b53f27 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_28fa5d27d4a7a2ea10013550d25029a8 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_44ec84dce40b18d4dbd1a0daa6518986 = $(`<div id="html_44ec84dce40b18d4dbd1a0daa6518986" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 ALQUERIA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 40 B SUR # 52C- 60<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_28fa5d27d4a7a2ea10013550d25029a8.setContent(html_44ec84dce40b18d4dbd1a0daa6518986);
-            
-        
-
-        marker_2fdb88a4d164ef69f3c185578090ae49.bindPopup(popup_28fa5d27d4a7a2ea10013550d25029a8)
-        ;
-
-        
-    
-    
-            marker_2fdb88a4d164ef69f3c185578090ae49.bindTooltip(
-                `<div>
-                     ALQUERIA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_2fdb88a4d164ef69f3c185578090ae49.setIcon(icon_f558c80df236661cbd980763e0b53f27);
-            
-    
-            var marker_3afd5c1d714f4e8d3a36f29852509c92 = L.marker(
-                [4.628531297537844, -74.11137720878898],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_946f7e138382c3d3a1c2f6e731c7e5ef = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_a96e7b9e850e5724bbb15bb4e6a4f2fe = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_863a68589d793e25a7b93ae0bb34acf8 = $(`<div id="html_863a68589d793e25a7b93ae0bb34acf8" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 ALCALA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 51 C # 33- 41 SUR<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_a96e7b9e850e5724bbb15bb4e6a4f2fe.setContent(html_863a68589d793e25a7b93ae0bb34acf8);
-            
-        
-
-        marker_3afd5c1d714f4e8d3a36f29852509c92.bindPopup(popup_a96e7b9e850e5724bbb15bb4e6a4f2fe)
-        ;
-
-        
-    
-    
-            marker_3afd5c1d714f4e8d3a36f29852509c92.bindTooltip(
-                `<div>
-                     ALCALA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_3afd5c1d714f4e8d3a36f29852509c92.setIcon(icon_946f7e138382c3d3a1c2f6e731c7e5ef);
-            
-    
-            var marker_957f866110ed1f9e11609a9ad89f308b = L.marker(
-                [4.625148447399027, -74.10902392686707],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_72a62746ccba09a05c1fae473525e057 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_4c226f762dd4fa3a30c075e4130389d3 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_caa23a194a88aa9156dfd01bc7ac4b01 = $(`<div id="html_caa23a194a88aa9156dfd01bc7ac4b01" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SANTA RITA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 41 # 34-35 SUR<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_4c226f762dd4fa3a30c075e4130389d3.setContent(html_caa23a194a88aa9156dfd01bc7ac4b01);
-            
-        
-
-        marker_957f866110ed1f9e11609a9ad89f308b.bindPopup(popup_4c226f762dd4fa3a30c075e4130389d3)
-        ;
-
-        
-    
-    
-            marker_957f866110ed1f9e11609a9ad89f308b.bindTooltip(
-                `<div>
-                     SANTA RITA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_957f866110ed1f9e11609a9ad89f308b.setIcon(icon_72a62746ccba09a05c1fae473525e057);
-            
-    
-            var marker_3c459964f738365fb712371c5d3ba71d = L.marker(
-                [4.625735056409376, -74.11217165207822],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_dca9e77d76eaa99b15df454852e724a3 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_b799df436c5f68964ebc635b75bc2aca = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_246b1a7af41ceef03bfe6d53fdf3de1a = $(`<div id="html_246b1a7af41ceef03bfe6d53fdf3de1a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 AUTOPISTA SUR             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 38 SUR NO 50A-70 / CRA 51 NO 37A- 52 SUR*<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_b799df436c5f68964ebc635b75bc2aca.setContent(html_246b1a7af41ceef03bfe6d53fdf3de1a);
-            
-        
-
-        marker_3c459964f738365fb712371c5d3ba71d.bindPopup(popup_b799df436c5f68964ebc635b75bc2aca)
-        ;
-
-        
-    
-    
-            marker_3c459964f738365fb712371c5d3ba71d.bindTooltip(
-                `<div>
-                     AUTOPISTA SUR
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_3c459964f738365fb712371c5d3ba71d.setIcon(icon_dca9e77d76eaa99b15df454852e724a3);
-            
-    
-            var marker_b529bfd2f2b62d71ec529db5dbf40ea1 = L.marker(
-                [4.622750503627573, -74.10897071268838],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_d30126cc435edc50c8fd2d9fa050971c = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_7126d2e4c2510e710f13c782a2194f31 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_72d683289a9832eb57b8496333386dc3 = $(`<div id="html_72d683289a9832eb57b8496333386dc3" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 LOS SAUCES             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> TV. 38 # 29 B-61 SUR<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_7126d2e4c2510e710f13c782a2194f31.setContent(html_72d683289a9832eb57b8496333386dc3);
-            
-        
-
-        marker_b529bfd2f2b62d71ec529db5dbf40ea1.bindPopup(popup_7126d2e4c2510e710f13c782a2194f31)
-        ;
-
-        
-    
-    
-            marker_b529bfd2f2b62d71ec529db5dbf40ea1.bindTooltip(
-                `<div>
-                     LOS SAUCES
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_b529bfd2f2b62d71ec529db5dbf40ea1.setIcon(icon_d30126cc435edc50c8fd2d9fa050971c);
-            
-    
-            var marker_b1b7d39b88b14614721384b0f3b216f2 = L.marker(
-                [4.62451123455095, -74.11733949020818],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_d363f0bcaada37d96728f6664b95ce62 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_9f7d2417a0a4fb25cf7f5ddb657cb750 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_3a21a59868b0281284fd4f7a3e130c7e = $(`<div id="html_3a21a59868b0281284fd4f7a3e130c7e" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 CARRERA CENTRO COMERCIAL             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> AV LAS AMERICAS No 50-15 - AV CLL 9 No 50-15<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_9f7d2417a0a4fb25cf7f5ddb657cb750.setContent(html_3a21a59868b0281284fd4f7a3e130c7e);
-            
-        
-
-        marker_b1b7d39b88b14614721384b0f3b216f2.bindPopup(popup_9f7d2417a0a4fb25cf7f5ddb657cb750)
-        ;
-
-        
-    
-    
-            marker_b1b7d39b88b14614721384b0f3b216f2.bindTooltip(
-                `<div>
-                     CARRERA CENTRO COMERCIAL
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_b1b7d39b88b14614721384b0f3b216f2.setIcon(icon_d363f0bcaada37d96728f6664b95ce62);
-            
-    
-            var marker_4fd2b62d3f914bf67cbe8cf2104d8ee2 = L.marker(
-                [4.62582184517942, -74.11045619499124],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_5252c2769e411d0ed48d16e110828a06 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_dec756b86af2aa8b8637675a6e3216aa = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_f5ad0ce29cc4b399e094850ea3687f54 = $(`<div id="html_f5ad0ce29cc4b399e094850ea3687f54" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SAN ANDRESITO             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 38 # 10- 90<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_dec756b86af2aa8b8637675a6e3216aa.setContent(html_f5ad0ce29cc4b399e094850ea3687f54);
-            
-        
-
-        marker_4fd2b62d3f914bf67cbe8cf2104d8ee2.bindPopup(popup_dec756b86af2aa8b8637675a6e3216aa)
-        ;
-
-        
-    
-    
-            marker_4fd2b62d3f914bf67cbe8cf2104d8ee2.bindTooltip(
-                `<div>
-                     SAN ANDRESITO
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_4fd2b62d3f914bf67cbe8cf2104d8ee2.setIcon(icon_5252c2769e411d0ed48d16e110828a06);
-            
-    
-            var marker_113fb5ccee13e0d351763da83c51a520 = L.marker(
-                [4.623298012845156, -74.11192590586352],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_a276825ec5c1580b521589389678a90b = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_3c81eb082932e9b419ed5fd7b48c3754 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_054cea09b33d0172cd40f6e222f6e192 = $(`<div id="html_054cea09b33d0172cd40f6e222f6e192" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SALÓN COMUNAL COLÓN             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 53 F # 4G- 04<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_3c81eb082932e9b419ed5fd7b48c3754.setContent(html_054cea09b33d0172cd40f6e222f6e192);
-            
-        
-
-        marker_113fb5ccee13e0d351763da83c51a520.bindPopup(popup_3c81eb082932e9b419ed5fd7b48c3754)
-        ;
-
-        
-    
-    
-            marker_113fb5ccee13e0d351763da83c51a520.bindTooltip(
-                `<div>
-                     SALÓN COMUNAL COLÓN
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_113fb5ccee13e0d351763da83c51a520.setIcon(icon_a276825ec5c1580b521589389678a90b);
-            
-    
-            var marker_2f2baad3e59a013bcd3ea13965edf787 = L.marker(
-                [4.626351396036692, -74.11269801470092],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_b9f30e6b74ea88c9833ec5ffec2406f5 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_8aa8225814ab541838d645b6304a5b2c = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_459c13510d1624d504423d156cbb11ba = $(`<div id="html_459c13510d1624d504423d156cbb11ba" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 COLONIA ORIENTAL             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 4 A  NO 51 A - 90<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_8aa8225814ab541838d645b6304a5b2c.setContent(html_459c13510d1624d504423d156cbb11ba);
-            
-        
-
-        marker_2f2baad3e59a013bcd3ea13965edf787.bindPopup(popup_8aa8225814ab541838d645b6304a5b2c)
-        ;
-
-        
-    
-    
-            marker_2f2baad3e59a013bcd3ea13965edf787.bindTooltip(
-                `<div>
-                     COLONIA ORIENTAL
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_2f2baad3e59a013bcd3ea13965edf787.setIcon(icon_b9f30e6b74ea88c9833ec5ffec2406f5);
-            
-    
-            var marker_52069275d9980d3641e9ed74bc76f65e = L.marker(
-                [4.624398722620163, -74.11191647844693],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_2593fef27f210f298ad53773b06630aa = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_d37a0f010e9a88800ab3b995891042c5 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_a3b6bf5b7e047cd0eb52531694064888 = $(`<div id="html_a3b6bf5b7e047cd0eb52531694064888" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SALÓN COMUNAL LA TRINIDAD             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 58 # 4B-31<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_d37a0f010e9a88800ab3b995891042c5.setContent(html_a3b6bf5b7e047cd0eb52531694064888);
-            
-        
-
-        marker_52069275d9980d3641e9ed74bc76f65e.bindPopup(popup_d37a0f010e9a88800ab3b995891042c5)
-        ;
-
-        
-    
-    
-            marker_52069275d9980d3641e9ed74bc76f65e.bindTooltip(
-                `<div>
-                     SALÓN COMUNAL LA TRINIDAD
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_52069275d9980d3641e9ed74bc76f65e.setIcon(icon_2593fef27f210f298ad53773b06630aa);
-            
-    
-            var marker_a8b9d8cf0a70f69884a5d027e63d3ff8 = L.marker(
-                [4.6250166125004135, -74.1160751378292],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_e694a4778a0e5e68f707a8072de3bbb8 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_78b4b9083d15186bb22ed120291707b2 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_5d4813994fe1e13287bfe7bfb4108bed = $(`<div id="html_5d4813994fe1e13287bfe7bfb4108bed" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 PRIMAVERA Y GORGONZOLA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 41B # 5-57<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_78b4b9083d15186bb22ed120291707b2.setContent(html_5d4813994fe1e13287bfe7bfb4108bed);
-            
-        
-
-        marker_a8b9d8cf0a70f69884a5d027e63d3ff8.bindPopup(popup_78b4b9083d15186bb22ed120291707b2)
-        ;
-
-        
-    
-    
-            marker_a8b9d8cf0a70f69884a5d027e63d3ff8.bindTooltip(
-                `<div>
-                     PRIMAVERA Y GORGONZOLA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_a8b9d8cf0a70f69884a5d027e63d3ff8.setIcon(icon_e694a4778a0e5e68f707a8072de3bbb8);
-            
-    
-            var marker_f2131d300c3ab1f9e19e3632a29dcd89 = L.marker(
-                [4.624396586775542, -74.11253934377568],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_964e0cb05b68ad56d04856b2f93a2dbf = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_d8018a8637e0cbf242558024154a8fd9 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_46122660bbde852cff38ec85d261b366 = $(`<div id="html_46122660bbde852cff38ec85d261b366" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 EL REMANZO             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> AV CLL 8S # 38A-46<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_d8018a8637e0cbf242558024154a8fd9.setContent(html_46122660bbde852cff38ec85d261b366);
-            
-        
-
-        marker_f2131d300c3ab1f9e19e3632a29dcd89.bindPopup(popup_d8018a8637e0cbf242558024154a8fd9)
-        ;
-
-        
-    
-    
-            marker_f2131d300c3ab1f9e19e3632a29dcd89.bindTooltip(
-                `<div>
-                     EL REMANZO
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_f2131d300c3ab1f9e19e3632a29dcd89.setIcon(icon_964e0cb05b68ad56d04856b2f93a2dbf);
-            
-    
-            var marker_90234d2ceada8e5c4805c27172afb96b = L.marker(
-                [4.629304556369018, -74.11138577485697],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_1eaf0525758c445f3c0648c26f63917d = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_403f902931b7969a973514449dd8de27 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_86e8c977c911699f0e8095c6d41022a1 = $(`<div id="html_86e8c977c911699f0e8095c6d41022a1" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 COLEGIO ROMULO GALLEGO             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 31B No 1-13<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_403f902931b7969a973514449dd8de27.setContent(html_86e8c977c911699f0e8095c6d41022a1);
-            
-        
-
-        marker_90234d2ceada8e5c4805c27172afb96b.bindPopup(popup_403f902931b7969a973514449dd8de27)
-        ;
-
-        
-    
-    
-            marker_90234d2ceada8e5c4805c27172afb96b.bindTooltip(
-                `<div>
-                     COLEGIO ROMULO GALLEGO
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_90234d2ceada8e5c4805c27172afb96b.setIcon(icon_1eaf0525758c445f3c0648c26f63917d);
-            
-    
-            var marker_cd0a143ffb3e6a765a6d5929c8678fe0 = L.marker(
-                [4.625573005550525, -74.10914421191052],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_0594662e263b1fddf2f39019a3954e3a = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_54560e89bb500cc6b0ccfe99d3783a34 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_05821c98015a81a3d076c57e52e38f0a = $(`<div id="html_05821c98015a81a3d076c57e52e38f0a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SALON COMUNAL VERAGUAS             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 4 A No 32 A-75 - CLL 4 A No 32 A-77<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_54560e89bb500cc6b0ccfe99d3783a34.setContent(html_05821c98015a81a3d076c57e52e38f0a);
-            
-        
-
-        marker_cd0a143ffb3e6a765a6d5929c8678fe0.bindPopup(popup_54560e89bb500cc6b0ccfe99d3783a34)
-        ;
-
-        
-    
-    
-            marker_cd0a143ffb3e6a765a6d5929c8678fe0.bindTooltip(
-                `<div>
-                     SALON COMUNAL VERAGUAS
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_cd0a143ffb3e6a765a6d5929c8678fe0.setIcon(icon_0594662e263b1fddf2f39019a3954e3a);
-            
-    
-            var marker_f732f99b6fe1cafaa38f89bae79c1f38 = L.marker(
-                [4.623484578142088, -74.11313654043654],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_1aea27b11f21a08f3846f7f01e19460f = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_61fa9385145919009f4dffe952b20338 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_05717bd35e027bea19ea60d7f9437c4d = $(`<div id="html_05717bd35e027bea19ea60d7f9437c4d" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 INSTITUTO DE INTEGRACION CULTURAL             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 5C No 31C-16<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_61fa9385145919009f4dffe952b20338.setContent(html_05717bd35e027bea19ea60d7f9437c4d);
-            
-        
-
-        marker_f732f99b6fe1cafaa38f89bae79c1f38.bindPopup(popup_61fa9385145919009f4dffe952b20338)
-        ;
-
-        
-    
-    
-            marker_f732f99b6fe1cafaa38f89bae79c1f38.bindTooltip(
-                `<div>
-                     INSTITUTO DE INTEGRACION CULTURAL
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_f732f99b6fe1cafaa38f89bae79c1f38.setIcon(icon_1aea27b11f21a08f3846f7f01e19460f);
-            
-    
-            var marker_85fbd48d4be8dacb221b16bad14e0b3a = L.marker(
-                [4.627245089824207, -74.11371698720579],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_a2a02a56847b704a21787cd0db6acc9d = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_863e40f31fbc7458d454ff369c59819a = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_6b2eba2e4e3d3d5cdd3f66e3dd36f067 = $(`<div id="html_6b2eba2e4e3d3d5cdd3f66e3dd36f067" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 COLEGIO DISTRITAL SORRENTO             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 5B No 53C-74<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_863e40f31fbc7458d454ff369c59819a.setContent(html_6b2eba2e4e3d3d5cdd3f66e3dd36f067);
-            
-        
-
-        marker_85fbd48d4be8dacb221b16bad14e0b3a.bindPopup(popup_863e40f31fbc7458d454ff369c59819a)
-        ;
-
-        
-    
-    
-            marker_85fbd48d4be8dacb221b16bad14e0b3a.bindTooltip(
-                `<div>
-                     COLEGIO DISTRITAL SORRENTO
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_85fbd48d4be8dacb221b16bad14e0b3a.setIcon(icon_a2a02a56847b704a21787cd0db6acc9d);
-            
-    
-            var marker_671f2843fab4d8ff9b2073450522b82c = L.marker(
-                [4.623158312700058, -74.11310351408717],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_47a16640110b2b9a24fed5ae9a47f3fa = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_e1c0bf11fea8a7b7b7f034cf9519134e = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_66224e1b96de2884ee18fb5068e7593f = $(`<div id="html_66224e1b96de2884ee18fb5068e7593f" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 LUIS CARLOS GALAN SARMIENTO             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 2 A # 47- 59<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_e1c0bf11fea8a7b7b7f034cf9519134e.setContent(html_66224e1b96de2884ee18fb5068e7593f);
-            
-        
-
-        marker_671f2843fab4d8ff9b2073450522b82c.bindPopup(popup_e1c0bf11fea8a7b7b7f034cf9519134e)
-        ;
-
-        
-    
-    
-            marker_671f2843fab4d8ff9b2073450522b82c.bindTooltip(
-                `<div>
-                     LUIS CARLOS GALAN SARMIENTO
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_671f2843fab4d8ff9b2073450522b82c.setIcon(icon_47a16640110b2b9a24fed5ae9a47f3fa);
-            
-    
-            var marker_66854b9a671ef5b9316672f3bceffb5b = L.marker(
-                [4.62601772719001, -74.11026919576459],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_ec42bb1081f84fa01302eb5ab7ac7e1c = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_93a3b2ea548cae1846e6e4bd33cf0334 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_ef3c137235fee7ef5ddd2115c5544d9d = $(`<div id="html_ef3c137235fee7ef5ddd2115c5544d9d" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 CULTURA POPULAR             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 32 SUR No 51-12<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_93a3b2ea548cae1846e6e4bd33cf0334.setContent(html_ef3c137235fee7ef5ddd2115c5544d9d);
-            
-        
-
-        marker_66854b9a671ef5b9316672f3bceffb5b.bindPopup(popup_93a3b2ea548cae1846e6e4bd33cf0334)
-        ;
-
-        
-    
-    
-            marker_66854b9a671ef5b9316672f3bceffb5b.bindTooltip(
-                `<div>
-                     CULTURA POPULAR
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_66854b9a671ef5b9316672f3bceffb5b.setIcon(icon_ec42bb1081f84fa01302eb5ab7ac7e1c);
-            
-    
-            var marker_e26902fc13c9134ee3e0a418ce1d5187 = L.marker(
-                [4.621680659752241, -74.11144249778067],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_cfe29bcf5cae7f09df2687884498fc42 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_5747fd8b21e18403626f8db007a33946 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_ab93488f9ef1fa8c5389c7ffc2de7810 = $(`<div id="html_ab93488f9ef1fa8c5389c7ffc2de7810" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SAN EUSEBIO             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 51A No 26-38SUR<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_5747fd8b21e18403626f8db007a33946.setContent(html_ab93488f9ef1fa8c5389c7ffc2de7810);
-            
-        
-
-        marker_e26902fc13c9134ee3e0a418ce1d5187.bindPopup(popup_5747fd8b21e18403626f8db007a33946)
-        ;
-
-        
-    
-    
-            marker_e26902fc13c9134ee3e0a418ce1d5187.bindTooltip(
-                `<div>
-                     SAN EUSEBIO
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_e26902fc13c9134ee3e0a418ce1d5187.setIcon(icon_cfe29bcf5cae7f09df2687884498fc42);
-            
-    
-            var marker_87bb2f1c8ce292ea96d21ca64cf37d2e = L.marker(
-                [4.622943627902203, -74.11315952040754],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_51ec485fd950ca035bc4ebdb8cc603b8 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_07ce1309947b7a45ab15e467d930ca0c = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_5cd0425363fcc1eabf03576be233af6b = $(`<div id="html_5cd0425363fcc1eabf03576be233af6b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 LOS ANGELES             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 39 SUR No 51F-59 - CLL 39 SUR No 51F-21<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_07ce1309947b7a45ab15e467d930ca0c.setContent(html_5cd0425363fcc1eabf03576be233af6b);
-            
-        
-
-        marker_87bb2f1c8ce292ea96d21ca64cf37d2e.bindPopup(popup_07ce1309947b7a45ab15e467d930ca0c)
-        ;
-
-        
-    
-    
-            marker_87bb2f1c8ce292ea96d21ca64cf37d2e.bindTooltip(
-                `<div>
-                     LOS ANGELES
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_87bb2f1c8ce292ea96d21ca64cf37d2e.setIcon(icon_51ec485fd950ca035bc4ebdb8cc603b8);
-            
-    
-            var marker_6d377d8498aff9e5fd97b24419ccc797 = L.marker(
-                [4.625993722471739, -74.11107346513377],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_4477b0e5d0f2053d2f21a0a34d9cc472 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_5b78c55605728a5c24ec54809ed2a5e5 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_824d85d1fad9330e84cc5afe37428157 = $(`<div id="html_824d85d1fad9330e84cc5afe37428157" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 C.C. OUTLET FACTORY             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 65 No 67A-16 AV CLL 9 No 62-84 ENTRADA 1 y 2<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_5b78c55605728a5c24ec54809ed2a5e5.setContent(html_824d85d1fad9330e84cc5afe37428157);
-            
-        
-
-        marker_6d377d8498aff9e5fd97b24419ccc797.bindPopup(popup_5b78c55605728a5c24ec54809ed2a5e5)
-        ;
-
-        
-    
-    
-            marker_6d377d8498aff9e5fd97b24419ccc797.bindTooltip(
-                `<div>
-                     C.C. OUTLET FACTORY
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_6d377d8498aff9e5fd97b24419ccc797.setIcon(icon_4477b0e5d0f2053d2f21a0a34d9cc472);
-            
-    
-            var marker_d6d287649e5c96a0267fb6d008f3da5a = L.marker(
-                [4.627076933159991, -74.1119058449013],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_cab8c078edea767b3d8529939095c430 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_1d049c0f1a6b71194db4ba0a2b6aa3c6 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_884a4ab0dc0f027e79a87274fee68320 = $(`<div id="html_884a4ab0dc0f027e79a87274fee68320" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 JORGE GAITAN CORTES             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 17 B SUR # 34 A-21 /CRA 34 #17 A-70 SUR<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_1d049c0f1a6b71194db4ba0a2b6aa3c6.setContent(html_884a4ab0dc0f027e79a87274fee68320);
-            
-        
-
-        marker_d6d287649e5c96a0267fb6d008f3da5a.bindPopup(popup_1d049c0f1a6b71194db4ba0a2b6aa3c6)
-        ;
-
-        
-    
-    
-            marker_d6d287649e5c96a0267fb6d008f3da5a.bindTooltip(
-                `<div>
-                     JORGE GAITAN CORTES
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_d6d287649e5c96a0267fb6d008f3da5a.setIcon(icon_cab8c078edea767b3d8529939095c430);
-            
-    
-            var marker_b89fb53d6bdb9a85ee0352ec1968921a = L.marker(
-                [4.62594273656238, -74.11016271001893],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_a06a051712dab6a51b8532a815f5a85f = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_d3cdbc1b841ee04dd645a439bb3aa92d = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_b5110eccae6111fa4da00c362d812b06 = $(`<div id="html_b5110eccae6111fa4da00c362d812b06" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 CENTRO PARA CIEGOS  CRAC             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 8 SUR # 31 A-31 /AV CLL 8 SUR #31 A- 31<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_d3cdbc1b841ee04dd645a439bb3aa92d.setContent(html_b5110eccae6111fa4da00c362d812b06);
-            
-        
-
-        marker_b89fb53d6bdb9a85ee0352ec1968921a.bindPopup(popup_d3cdbc1b841ee04dd645a439bb3aa92d)
-        ;
-
-        
-    
-    
-            marker_b89fb53d6bdb9a85ee0352ec1968921a.bindTooltip(
-                `<div>
-                     CENTRO PARA CIEGOS  CRAC
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_b89fb53d6bdb9a85ee0352ec1968921a.setIcon(icon_a06a051712dab6a51b8532a815f5a85f);
-            
-    
-            var marker_e560533fac9effd9d1e7293630135260 = L.marker(
-                [4.625368703435224, -74.11350410618775],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_e5b0dc9557d6f518ceb15052783fb147 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_9ffdcc0d99f0c0e92702967d8fdcf561 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_fc9ea7f9c0b7eefcedde5b38bd035349 = $(`<div id="html_fc9ea7f9c0b7eefcedde5b38bd035349" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 JOSE JOAQUIN CASAS SEDE A             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 56 # 17-11<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_9ffdcc0d99f0c0e92702967d8fdcf561.setContent(html_fc9ea7f9c0b7eefcedde5b38bd035349);
-            
-        
-
-        marker_e560533fac9effd9d1e7293630135260.bindPopup(popup_9ffdcc0d99f0c0e92702967d8fdcf561)
-        ;
-
-        
-    
-    
-            marker_e560533fac9effd9d1e7293630135260.bindTooltip(
-                `<div>
-                     JOSE JOAQUIN CASAS SEDE A
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_e560533fac9effd9d1e7293630135260.setIcon(icon_e5b0dc9557d6f518ceb15052783fb147);
-            
-    
-            var marker_b85e6da0ee50c2de9c194be8375cdaec = L.marker(
-                [4.624997792608822, -74.11275532429319],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_0db0100ab49db931311ca2af874a092b = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_0c6a10a4d0e5741cec34042d244f14bb = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_0355613a49245e45c07862a5692beb65 = $(`<div id="html_0355613a49245e45c07862a5692beb65" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 CENTRO EDUCATIVO DISTRITAL ESPAÑA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CLL 18 # 35 - 25<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_0c6a10a4d0e5741cec34042d244f14bb.setContent(html_0355613a49245e45c07862a5692beb65);
-            
-        
-
-        marker_b85e6da0ee50c2de9c194be8375cdaec.bindPopup(popup_0c6a10a4d0e5741cec34042d244f14bb)
-        ;
-
-        
-    
-    
-            marker_b85e6da0ee50c2de9c194be8375cdaec.bindTooltip(
-                `<div>
-                     CENTRO EDUCATIVO DISTRITAL ESPAÑA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_b85e6da0ee50c2de9c194be8375cdaec.setIcon(icon_0db0100ab49db931311ca2af874a092b);
-            
-    
-            var marker_7a733affb1f0594efd4b284324164527 = L.marker(
-                [4.6226429560192654, -74.11288421630626],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_dd98ce6931b64e4622675f3dba35b9a7 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_4c18e291a49f8a92691e046ee06f2c96 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_53a96c8e0c1ae0f7926f87a3b56e30f9 = $(`<div id="html_53a96c8e0c1ae0f7926f87a3b56e30f9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SALON COMUNAL TORREMOLINOS I             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 52 BIS No 19 - 53<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_4c18e291a49f8a92691e046ee06f2c96.setContent(html_53a96c8e0c1ae0f7926f87a3b56e30f9);
-            
-        
-
-        marker_7a733affb1f0594efd4b284324164527.bindPopup(popup_4c18e291a49f8a92691e046ee06f2c96)
-        ;
-
-        
-    
-    
-            marker_7a733affb1f0594efd4b284324164527.bindTooltip(
-                `<div>
-                     SALON COMUNAL TORREMOLINOS I
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_7a733affb1f0594efd4b284324164527.setIcon(icon_dd98ce6931b64e4622675f3dba35b9a7);
-            
-    
-            var marker_62b1502023f5c4e6298d3089b0d9c493 = L.marker(
-                [4.624160311583211, -74.11502702989627],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_8ffe6eb1f1d58274e638a6f8069b5c19 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_a3aa9ef93f2c11365c9352d641f69ecf = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_e3d5b9c88b63573e360eb8fed12fc0c9 = $(`<div id="html_e3d5b9c88b63573e360eb8fed12fc0c9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SALON COMUNAL JOSE ANTONIO GALAN             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> DIAG 2 No 57 - 39<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_a3aa9ef93f2c11365c9352d641f69ecf.setContent(html_e3d5b9c88b63573e360eb8fed12fc0c9);
-            
-        
-
-        marker_62b1502023f5c4e6298d3089b0d9c493.bindPopup(popup_a3aa9ef93f2c11365c9352d641f69ecf)
-        ;
-
-        
-    
-    
-            marker_62b1502023f5c4e6298d3089b0d9c493.bindTooltip(
-                `<div>
-                     SALON COMUNAL JOSE ANTONIO GALAN
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_62b1502023f5c4e6298d3089b0d9c493.setIcon(icon_8ffe6eb1f1d58274e638a6f8069b5c19);
-            
-    
-            var marker_c803b37f74432d52de117764eb3e33b4 = L.marker(
-                [4.624678722458081, -74.11150775944587],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_32fcded68c56ca03779dc830034da2ef = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_2708546d954672497b1e4cdac23ae975 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_3f1ccc119959e4dc312e91b07b2d648f = $(`<div id="html_3f1ccc119959e4dc312e91b07b2d648f" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SALON COMUNAL RAFAEL EUCALIPTOS             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 53 B BIS No 4C - 04<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_2708546d954672497b1e4cdac23ae975.setContent(html_3f1ccc119959e4dc312e91b07b2d648f);
-            
-        
-
-        marker_c803b37f74432d52de117764eb3e33b4.bindPopup(popup_2708546d954672497b1e4cdac23ae975)
-        ;
-
-        
-    
-    
-            marker_c803b37f74432d52de117764eb3e33b4.bindTooltip(
-                `<div>
-                     SALON COMUNAL RAFAEL EUCALIPTOS
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_c803b37f74432d52de117764eb3e33b4.setIcon(icon_32fcded68c56ca03779dc830034da2ef);
-            
-    
-            var marker_2f2b78bd140121cde41bb6f5da887ebf = L.marker(
-                [4.627714244452438, -74.11157788945563],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_aa0ae6fb19bf638ce4d9ab0d6645d8a7 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_621a7f98f571b67415fdc34b8f832343 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_1415e6c21a0be3de9421a844c1d999e9 = $(`<div id="html_1415e6c21a0be3de9421a844c1d999e9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SALON COMUNAL NUEVA PRIMAVERA             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 43 B No 4 - 26<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_621a7f98f571b67415fdc34b8f832343.setContent(html_1415e6c21a0be3de9421a844c1d999e9);
-            
-        
-
-        marker_2f2b78bd140121cde41bb6f5da887ebf.bindPopup(popup_621a7f98f571b67415fdc34b8f832343)
-        ;
-
-        
-    
-    
-            marker_2f2b78bd140121cde41bb6f5da887ebf.bindTooltip(
-                `<div>
-                     SALON COMUNAL NUEVA PRIMAVERA
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_2f2b78bd140121cde41bb6f5da887ebf.setIcon(icon_aa0ae6fb19bf638ce4d9ab0d6645d8a7);
-            
-    
-            var marker_8dd85bd2e4762b55666f4ccd0e6dce01 = L.marker(
-                [4.626287236579137, -74.11208977308671],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_83e68ae351494ad5533cd7c8295aee96 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_7058e07f31ca94e75b2ba65fce3070de = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_6aabc2753df7b89f35e2845812ce6eff = $(`<div id="html_6aabc2753df7b89f35e2845812ce6eff" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SALON COMUNAL VILLA INES             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 38 A No 1D - 30<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_7058e07f31ca94e75b2ba65fce3070de.setContent(html_6aabc2753df7b89f35e2845812ce6eff);
-            
-        
-
-        marker_8dd85bd2e4762b55666f4ccd0e6dce01.bindPopup(popup_7058e07f31ca94e75b2ba65fce3070de)
-        ;
-
-        
-    
-    
-            marker_8dd85bd2e4762b55666f4ccd0e6dce01.bindTooltip(
-                `<div>
-                     SALON COMUNAL VILLA INES
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_8dd85bd2e4762b55666f4ccd0e6dce01.setIcon(icon_83e68ae351494ad5533cd7c8295aee96);
-            
-    
-            var marker_76f8da0a74f3fc906708898c92c6558a = L.marker(
-                [4.622073919689275, -74.11256917426675],
-                {
-}
-            ).addTo(marker_cluster_eead6514a0c96a24a242269ae6437690);
-        
-    
-            var icon_cacd917b3789d0f12b7fafaacab2af78 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "check-circle",
-  "prefix": "fa",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_e5e6e7ca842ac8773699cf0f9ddb09d7 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_f13aad4b71c172965266fd6cfcade2b6 = $(`<div id="html_f13aad4b71c172965266fd6cfcade2b6" style="width: 100.0%; height: 100.0%;">         <div style="font-family: 'Segoe UI', Arial; min-width: 200px; max-width: 280px;">             <h4 style="margin: 0 0 8px 0; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 5px;">                 SALON COMUNAL BOCHICA CENTRAL             </h4>             <p style="margin: 5px 0;">                 <strong>📍 Localidad:</strong> PUENTE ARANDA<br>                 <strong>🏛️ Municipio:</strong> BOGOTA. D.C.<br>                 <strong>📫 Dirección:</strong> CRA 35 No 1C-30<br>             </p>             <hr style="margin: 8px 0; border: 1px dashed #ccc;">             <p style="margin: 0; font-size: 0.9em; color: #666;">                 <i>Haz clic para más detalles</i>             </p>         </div>         </div>`)[0];
-                popup_e5e6e7ca842ac8773699cf0f9ddb09d7.setContent(html_f13aad4b71c172965266fd6cfcade2b6);
-            
-        
-
-        marker_76f8da0a74f3fc906708898c92c6558a.bindPopup(popup_e5e6e7ca842ac8773699cf0f9ddb09d7)
-        ;
-
-        
-    
-    
-            marker_76f8da0a74f3fc906708898c92c6558a.bindTooltip(
-                `<div>
-                     SALON COMUNAL BOCHICA CENTRAL
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_76f8da0a74f3fc906708898c92c6558a.setIcon(icon_cacd917b3789d0f12b7fafaacab2af78);
-            
-    
-            marker_cluster_eead6514a0c96a24a242269ae6437690.addTo(feature_group_c71f11ea1149528b6948f4ca2ae1ce03);
-        
-    
-            feature_group_c71f11ea1149528b6948f4ca2ae1ce03.addTo(map_3a6d12ff4f08af77eb614bff89ed6448);
-        
-    
-            var layer_control_b870518aa4206368f3653a959624cd56_layers = {
-                base_layers : {
-                    "cartodbpositron" : tile_layer_a6dd15bfb1b97d0955e2370b1aefd7ea,
-                },
-                overlays :  {
-                    "PUENTE ARANDA" : feature_group_c71f11ea1149528b6948f4ca2ae1ce03,
-                },
-            };
-            let layer_control_b870518aa4206368f3653a959624cd56 = L.control.layers(
-                layer_control_b870518aa4206368f3653a959624cd56_layers.base_layers,
-                layer_control_b870518aa4206368f3653a959624cd56_layers.overlays,
-                {
-  "position": "topright",
-  "collapsed": false,
-  "autoZIndex": true,
-}
-            ).addTo(map_3a6d12ff4f08af77eb614bff89ed6448);
-
-        
-    
-            var feature_group_f6c0bc2a924c97c4568df6824e73d500searchControl = new L.Control.Search({
-                layer: feature_group_f6c0bc2a924c97c4568df6824e73d500,
-                
-                propertyName: 'PUESTO',
-                
-                collapsed: false,
-                textPlaceholder: '🔍 Buscar puesto de votación...',
-                position:'topleft',
-            
-                initial: false,
-                
-                hideMarkerOnCollapse: true
-            
-                });
-                feature_group_f6c0bc2a924c97c4568df6824e73d500searchControl.on('search:locationfound', function(e) {
-                    feature_group_f6c0bc2a924c97c4568df6824e73d500.setStyle(function(feature){
-                        return feature.properties.style
-                    })
-                    
-                    if(e.layer._popup)
-                        e.layer.openPopup();
-                })
-                feature_group_f6c0bc2a924c97c4568df6824e73d500searchControl.on('search:collapsed', function(e) {
-                        feature_group_f6c0bc2a924c97c4568df6824e73d500.setStyle(function(feature){
-                            return feature.properties.style
-                    });
-                });
-            map_3a6d12ff4f08af77eb614bff89ed6448.addControl( feature_group_f6c0bc2a924c97c4568df6824e73d500searchControl );
-
-        
+function populateDeptoFilter() {
+  const deptos = [...new Set(RAW.detalle.map(d => d.Departamento))].sort();
+  const sel = document.getElementById('f-depto');
+  deptos.forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; sel.appendChild(o); });
+}
+
+// ─── FILTERS ─────────────────────────────────────────
+function applyFilters() {
+  const reg = document.getElementById('f-regional').value;
+  const op  = document.getElementById('f-operador').value;
+  const dep = document.getElementById('f-depto').value;
+  const est = document.getElementById('f-estado').value;
+  filtered = RAW.detalle.filter(d =>
+    (!reg || d.Regional === reg) &&
+    (!op  || d.Operador === op) &&
+    (!dep || d.Departamento === dep) &&
+    (!est || d.Estado === est)
+  );
+  document.getElementById('filter-count').textContent = filtered.length + ' registros';
+  renderAll();
+}
+
+function resetFilters() {
+  ['f-regional','f-operador','f-depto','f-estado'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('search-box').value = '';
+  filtered = [...RAW.detalle];
+  document.getElementById('filter-count').textContent = '128 registros';
+  renderAll();
+}
+
+// ─── COMPUTE ─────────────────────────────────────────
+function compute() {
+  const total = filtered.length;
+  const ss  = filtered.filter(d => ['Site Survey','Diseño','Construcción'].includes(d.Estado) || d.Estado === 'Site Survey').length;
+  const ssDone = filtered.filter(d => d.Estado !== 'En Proceso').length;
+  const dis = filtered.filter(d => ['Diseño','Construcción'].includes(d.Estado)).length;
+  const con = filtered.filter(d => d.Estado === 'Construcción').length;
+  const km  = filtered.reduce((s,d) => s + d.Distancia_m, 0) / 1000;
+  const kmMax = Math.max(...filtered.map(d => d.Distancia_m)) / 1000;
+  // Recalculate ss properly: SS = has completed site survey = Estado != 'En Proceso' but actually based on completion flags
+  // Use: ss=ssDone (not en proceso), dis=dis, con=con
+  const ssCount = filtered.filter(d => ['Site Survey','Diseño','Construcción'].includes(d.Estado)).length;
+  return { total, ssCount, dis, con, km, kmMax };
+}
+
+// ─── RENDER ALL ──────────────────────────────────────
+function renderAll() {
+  const c = compute();
+  updateKPIs(c);
+  updateGauges(c);
+  renderRegionalChart();
+  renderEstadoDonut();
+  renderOperadorChart();
+  renderKmDeptoChart();
+  renderTable(document.getElementById('search-box').value);
+  document.getElementById('km-total').textContent = c.km.toFixed(1);
+  document.getElementById('km-avg').textContent = (c.km / c.total).toFixed(2);
+  document.getElementById('km-max').textContent = c.kmMax.toFixed(1);
+  document.getElementById('table-count').textContent = filtered.length + ' registros';
+}
+
+function updateKPIs(c) {
+  const pSS  = c.total ? (c.ssCount/c.total*100).toFixed(1) : 0;
+  const pDis = c.total ? (c.dis/c.total*100).toFixed(1) : 0;
+  const pCon = c.total ? (c.con/c.total*100).toFixed(1) : 0;
+  document.getElementById('kpi-total').textContent = c.total;
+  document.getElementById('kpi-ss').textContent = c.ssCount;
+  document.getElementById('kpi-dis').textContent = c.dis;
+  document.getElementById('kpi-con').textContent = c.con;
+  document.getElementById('kpi-ss-pct').textContent  = pSS+'%';
+  document.getElementById('kpi-dis-pct').textContent = pDis+'%';
+  document.getElementById('kpi-con-pct').textContent = pCon+'%';
+  document.getElementById('bar-ss').style.width  = pSS+'%';
+  document.getElementById('bar-dis').style.width = pDis+'%';
+  document.getElementById('bar-con').style.width = pCon+'%';
+}
+
+function updateGauges(c) {
+  const pSS  = c.total ? (c.ssCount/c.total*100).toFixed(1) : 0;
+  const pDis = c.total ? (c.dis/c.total*100).toFixed(1) : 0;
+  const pCon = c.total ? (c.con/c.total*100).toFixed(1) : 0;
+  document.getElementById('pg-ss').style.width  = pSS+'%';
+  document.getElementById('pg-dis').style.width = pDis+'%';
+  document.getElementById('pg-con').style.width = pCon+'%';
+  document.getElementById('pg-ss-nums').textContent  = c.ssCount+' / '+c.total;
+  document.getElementById('pg-dis-nums').textContent = c.dis+' / '+c.total;
+  document.getElementById('pg-con-nums').textContent = c.con+' / '+c.total;
+  document.getElementById('pg-ss-pct').textContent  = pSS+'%';
+  document.getElementById('pg-dis-pct').textContent = pDis+'%';
+  document.getElementById('pg-con-pct').textContent = pCon+'%';
+}
+
+// ─── CHARTS ──────────────────────────────────────────
+const CSS = { ss:'#3b82f6', dis:'#f59e0b', con:'#00d4aa', pen:'#6b7280', border:'#21262d', text2:'#8b949e' };
+
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+function chartOpts(type = 'bar') {
+  return {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      backgroundColor: '#1c2230', borderColor: '#21262d', borderWidth: 1,
+      titleColor: '#e6edf3', bodyColor: '#8b949e', padding: 10
+    }},
+    scales: type !== 'doughnut' ? {
+      x: { grid: { color: CSS.border }, ticks: { color: CSS.text2, font: { family: 'DM Sans', size: 11 } } },
+      y: { grid: { color: CSS.border }, ticks: { color: CSS.text2, font: { family: 'DM Sans', size: 11 } } }
+    } : {}
+  };
+}
+
+function renderRegionalChart() {
+  const regionMap = {};
+  filtered.forEach(d => {
+    if (!regionMap[d.Regional]) regionMap[d.Regional] = {ss:0,dis:0,con:0,total:0};
+    regionMap[d.Regional].total++;
+    if (['Site Survey','Diseño','Construcción'].includes(d.Estado)) regionMap[d.Regional].ss++;
+    if (['Diseño','Construcción'].includes(d.Estado)) regionMap[d.Regional].dis++;
+    if (d.Estado === 'Construcción') regionMap[d.Regional].con++;
+  });
+  const labels = Object.keys(regionMap);
+  destroyChart('regional');
+  const ctx = document.getElementById('chart-regional').getContext('2d');
+  const opts = chartOpts('bar');
+  opts.plugins.legend = { display: true, labels: { color: CSS.text2, font: { family: 'DM Sans', size: 11 }, boxWidth: 12 } };
+  opts.scales.x.stacked = false;
+  charts['regional'] = new Chart(ctx, { type: 'bar', data: {
+    labels,
+    datasets: [
+      { label: 'Site Survey', data: labels.map(l => regionMap[l].ss), backgroundColor: CSS.ss+'99', borderColor: CSS.ss, borderWidth: 1, borderRadius: 4 },
+      { label: 'Diseño', data: labels.map(l => regionMap[l].dis), backgroundColor: CSS.dis+'99', borderColor: CSS.dis, borderWidth: 1, borderRadius: 4 },
+      { label: 'Construcción', data: labels.map(l => regionMap[l].con), backgroundColor: CSS.con+'99', borderColor: CSS.con, borderWidth: 1, borderRadius: 4 },
+    ]
+  }, options: opts });
+}
+
+function renderEstadoDonut() {
+  const counts = { 'Construcción': 0, 'Diseño': 0, 'Site Survey': 0, 'En Proceso': 0 };
+  filtered.forEach(d => counts[d.Estado] = (counts[d.Estado]||0) + 1);
+  const labels = Object.keys(counts);
+  const colors = [CSS.con, CSS.dis, CSS.ss, CSS.pen];
+  destroyChart('estado');
+  const ctx = document.getElementById('chart-estado').getContext('2d');
+  const opts = chartOpts('doughnut');
+  opts.cutout = '68%';
+  charts['estado'] = new Chart(ctx, { type: 'doughnut', data: {
+    labels,
+    datasets: [{ data: labels.map(l => counts[l]), backgroundColor: colors.map(c => c+'cc'), borderColor: colors, borderWidth: 2, hoverOffset: 4 }]
+  }, options: opts });
+  const leg = document.getElementById('legend-estado');
+  leg.innerHTML = labels.map((l,i) => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i]}"></div>
+      <span class="legend-label">${l}</span>
+      <span class="legend-val">${counts[l]}</span>
+    </div>`).join('');
+}
+
+function renderOperadorChart() {
+  const opMap = {};
+  filtered.forEach(d => {
+    if (!opMap[d.Operador]) opMap[d.Operador] = {ss:0,dis:0,con:0,total:0};
+    opMap[d.Operador].total++;
+    if (['Site Survey','Diseño','Construcción'].includes(d.Estado)) opMap[d.Operador].ss++;
+    if (['Diseño','Construcción'].includes(d.Estado)) opMap[d.Operador].dis++;
+    if (d.Estado === 'Construcción') opMap[d.Operador].con++;
+  });
+  const labels = Object.keys(opMap);
+  destroyChart('operador');
+  const ctx = document.getElementById('chart-operador').getContext('2d');
+  const opts = chartOpts('bar');
+  opts.indexAxis = 'y';
+  opts.plugins.legend = { display: true, labels: { color: CSS.text2, font: { family: 'DM Sans', size: 11 }, boxWidth: 10 } };
+  charts['operador'] = new Chart(ctx, { type: 'bar', data: {
+    labels,
+    datasets: [
+      { label: 'Site Survey', data: labels.map(l => opMap[l].ss), backgroundColor: CSS.ss+'99', borderColor: CSS.ss, borderWidth: 1, borderRadius: 3 },
+      { label: 'Diseño', data: labels.map(l => opMap[l].dis), backgroundColor: CSS.dis+'99', borderColor: CSS.dis, borderWidth: 1, borderRadius: 3 },
+      { label: 'Construcción', data: labels.map(l => opMap[l].con), backgroundColor: CSS.con+'99', borderColor: CSS.con, borderWidth: 1, borderRadius: 3 },
+    ]
+  }, options: opts });
+}
+
+function renderKmDeptoChart() {
+  const depMap = {};
+  filtered.forEach(d => { depMap[d.Departamento] = (depMap[d.Departamento]||0) + d.Distancia_m/1000; });
+  const sorted = Object.entries(depMap).sort((a,b) => b[1]-a[1]);
+  const labels = sorted.map(e => e[0]);
+  const vals   = sorted.map(e => +e[1].toFixed(1));
+  destroyChart('km-depto');
+  const ctx = document.getElementById('chart-km-depto').getContext('2d');
+  const opts = chartOpts('bar');
+  opts.scales.y.ticks.callback = v => v+' km';
+  charts['km-depto'] = new Chart(ctx, { type: 'bar', data: {
+    labels,
+    datasets: [{ label: 'Km FO', data: vals,
+      backgroundColor: labels.map((_,i) => `hsl(${170 + i*12},70%,45%)99`),
+      borderColor: labels.map((_,i) => `hsl(${170 + i*12},70%,55%)`),
+      borderWidth: 1, borderRadius: 4 }]
+  }, options: opts });
+}
+
+// ─── TABLE ────────────────────────────────────────────
+function statusBadge(e) {
+  const map = { 'Construcción':'st-con','Diseño':'st-dis','Site Survey':'st-ss','En Proceso':'st-pen' };
+  const icons = { 'Construcción':'🏗️','Diseño':'📐','Site Survey':'🔍','En Proceso':'⏳' };
+  return `<span class="status-badge ${map[e]||'st-pen'}">${icons[e]||''} ${e}</span>`;
+}
+
+function renderTable(query='') {
+  const q = query.toLowerCase();
+  const rows = filtered.filter(d =>
+    !q ||
+    d['Nombre IE Beneficiaria'].toLowerCase().includes(q) ||
+    d.Municipio.toLowerCase().includes(q) ||
+    d.Operador.toLowerCase().includes(q) ||
+    d.Departamento.toLowerCase().includes(q)
+  );
+  document.getElementById('table-body').innerHTML = rows.map(d => `
+    <tr>
+      <td>${d['ID Benef']}</td>
+      <td title="${d['Nombre IE Beneficiaria']}">${d['Nombre IE Beneficiaria']}</td>
+      <td>${d.Regional}</td>
+      <td>${d.Departamento}</td>
+      <td>${d.Municipio}</td>
+      <td>${d.Operador}</td>
+      <td>${statusBadge(d.Estado)}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace">${d.Distancia_m.toLocaleString('es-CO')}</td>
+    </tr>`).join('');
+  document.getElementById('table-count').textContent = rows.length + ' registros';
+}
+
+function filterTable(q) { renderTable(q); }
 </script>
+</body>
 </html>
